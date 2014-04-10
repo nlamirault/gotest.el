@@ -126,6 +126,7 @@
 ;;;###autoload
 (defun go-test-current-project ()
   "Launch go test on project."
+  (interactive)
   (go-test-run ""))
 
 

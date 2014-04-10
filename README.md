@@ -19,15 +19,13 @@ or [Cask](https://github.com/cask/cask):
 
 2 functions are available :
 * `go-test-current-test`: launch unit tests for the current test
-* `go-test-current-module`: launch unit tests for the current package
-* `go-test-current-project`: launch all unit tests
+* `go-test-current-file`: launch unit tests for the current file
 
 You can create some key bindings with these commands:
 
 ```lisp
-(define-key go-mode-map (kbd "C-x t") 'go-test-current-class)
-(define-key go-mode-map (kbd "C-x m") 'go-test-current-module)
-(define-key go-mode-map (kbd "C-x p") 'go-test-current-project)
+(define-key go-mode-map (kbd "C-x f") 'go-test-current-file)
+(define-key go-mode-map (kbd "C-x t") 'go-test-current-test)
 ```
 
 ## Development
