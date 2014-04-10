@@ -8,6 +8,7 @@
 
 (depends-on "f")
 (depends-on "s")
+(depends-on "go-mode")
 
 ;; Development
 (development
