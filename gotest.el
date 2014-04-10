@@ -4,6 +4,7 @@
 ;; URL: https://github.com/nlamirault/gotest.el
 ;; Version: 0.1.0
 ;; Keywords: go, tests
+;; Package-Requires: ((s "1.9.0") (f "0.16.2") (go-mode "0"))
 
 ;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -30,6 +31,7 @@
 
 (require 's)
 (require 'f)
+(require 'go-mode)
 
 
 (defgroup gotest nil
