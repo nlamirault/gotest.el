@@ -6,11 +6,10 @@
 
 (package-file "gotest.el")
 
-(depends-on "f")
-(depends-on "s")
-
 ;; Development
 (development
+ (depends-on "f")
+ (depends-on "s")
  (depends-on "pkg-info")
  (depends-on "ert")
  (depends-on "ert-runner"))

@@ -5,6 +5,8 @@
 ;; Version: 0.1.0
 ;; Keywords: go, tests
 
+;; Package-Requires: ((s "1.9.0") (f "0.11.0") (go-mode))
+
 ;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
@@ -30,18 +32,19 @@
 
 (require 's)
 (require 'f)
+(require 'go-mode)
 
 
 (defgroup gotest nil
   "GoTest utility"
   :group 'go)
 
-(defcustom go-program "go"
+(defcustom go-test-program go-command ;"go"
   "GO binary path."
   :type 'file
   :group 'go)
 
-(defcustom go-args ""
+(defcustom go-test-args ""
   "Argument to pass to go."
   :type 'string
   :group 'go)
@@ -58,7 +61,7 @@
 (defun go-test-get-program (args)
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-program " test "
+  (s-concat go-test-program " test "
             ;;(go-test-get-root-directory)
             args))
 
