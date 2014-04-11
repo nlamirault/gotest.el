@@ -39,20 +39,15 @@
   "GoTest utility"
   :group 'go)
 
-(defcustom go-test-program go-command ;"go"
-  "GO binary path."
-  :type 'file
-  :group 'go)
-
 (defcustom go-test-args ""
   "Argument to pass to go."
   :type 'string
-  :group 'go)
+  :group 'gotest)
 
-(defcustom go-test-verbose-mode nil
+(defcustom go-test-verbose nil
   "Display debugging information during test execution."
   :type 'boolean
-  :group 'go)
+  :group 'gotest)
 
 
 ;; Commands
@@ -61,7 +56,7 @@
 (defun go-test-get-program (args)
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-test-program " test "
+  (s-concat go-command " test "
             ;;(go-test-get-root-directory)
             args))
 
@@ -80,7 +75,7 @@
 
 (defun go-test-get-current-test ()
   (let ((start (point))
-	test-name)
+        test-name)
     (save-excursion
       (end-of-line)
       (unless (and
@@ -95,7 +90,7 @@
 
 (defun go-test-arguments (args)
   (let ((opts args))
-    (when go-test-verbose-mode
+    (when go-test-verbose
       (setq opts (s-concat opts " -v")))
     opts))
 
