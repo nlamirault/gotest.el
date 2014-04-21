@@ -9,3 +9,7 @@ func TestFoo(t *testing.T) {
 func TestBar(t *testing.T) {
 	t.Log("logBar")
 }
+
+func Test_Baz(t *testing.T) {
+	t.Log("log_Baz")
+}

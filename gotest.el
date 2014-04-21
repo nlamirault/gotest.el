@@ -67,11 +67,6 @@
       (file-truename (or (locate-dominating-file filename "Makefile")
                          "./")))))
 
-(defun go-test-get-current-file (&optional file)
-  "Return the filename of the go test for `FILE'."
-  (let* ((file (or file (buffer-file-name))))
-    (f-long (f-filename file))))
-
 
 (defun go-test-get-current-test ()
   (let ((start (point))
@@ -86,6 +81,17 @@
         (search-forward "Test")
         (setq test-name (thing-at-point 'word))))
     test-name))
+
+
+(defun go-test-get-current-file-tests ()
+  "Generate regexp to match tests in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (let (tests)
+      (while (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
+        (let ((test (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
+          (setq tests (append tests (list test)))))
+      (mapconcat 'identity tests "|"))))
 
 
 (defun go-test-arguments (args)
@@ -117,7 +123,7 @@
 (defun go-test-current-file ()
   "Launch go test on file."
   (interactive)
-  (let ((args (s-concat " -file=" (go-test-get-current-file))))
+  (let ((args (s-concat " -run='" (go-test-get-current-file-tests) "'")))
     (go-test-run args)))
 
 

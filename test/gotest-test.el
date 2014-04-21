@@ -40,12 +40,6 @@
 (defun go-test-command (&rest arg)
   (apply 's-concat "go test " arg))
 
-;; Files
-
-(ert-deftest test-go-test-get-current-file ()
-  (with-current-buffer (find-file-noselect testsuite-buffer-name)
-    (should (string= testsuite-buffer-name
-                     (go-test-get-current-file "go_test.go")))))
 
 ;; Arguments
 
@@ -65,6 +59,10 @@
     (save-excursion
       (re-search-forward "logFoo")
       (should (string= "TestFoo" (go-test-get-current-test))))))
+
+(ert-deftest test-go-test-get-current-file-tests ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (should (string= "TestFoo|TestBar|Test_Baz" (go-test-get-current-file-tests)))))
 
 (provide 'gotest-test)
 ;;; gotest-test.el ends here
