@@ -21,19 +21,31 @@
 
 ;;; Code:
 
+(defconst testsuite-dir
+  (if load-file-name
+      (file-name-directory load-file-name)
+    ;; Fall back to default directory (in case of M-x eval-buffer)
+    default-directory)
+  "Directory of the test suite.")
 
-(require 'test-helper)
-(require 'gotest)
+(defconst testsuite-buffer-name
+  (concat testsuite-dir "go_test.go")
+  "File name for testing.")
+
+
+(load (expand-file-name "../gotest" testsuite-dir) nil :no-message)
+(load (expand-file-name "test-helper.el" testsuite-dir) nil :no-message)
 
 
 (defun go-test-command (&rest arg)
   (apply 's-concat "go test " arg))
 
+;; Files
 
-;; FIXME
-;; (ert-deftest test-go-test-get-current-file ()
-;;   (should (string= "/tmp/foo/go_test.go"
-;; 		   (go-test-get-current-file "/tmp/foo/go_test.go"))))
+(ert-deftest test-go-test-get-current-file ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (should (string= testsuite-buffer-name
+                     (go-test-get-current-file "go_test.go")))))
 
 ;; Arguments
 
@@ -42,10 +54,17 @@
 		   (go-test-get-program (go-test-arguments "")))))
 
 (ert-deftest test-go-test-add-verbose-argument ()
-  (let ((go-test-verbose-mode t))
+  (let ((go-test-verbose t))
     (should (string= (go-test-command " -v")
 		     (go-test-get-program (go-test-arguments ""))))))
 
+;; Find
+
+(ert-deftest test-go-test-get-current-test ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (save-excursion
+      (re-search-forward "logFoo")
+      (should (string= "TestFoo" (go-test-get-current-test))))))
 
 (provide 'gotest-test)
 ;;; gotest-test.el ends here
