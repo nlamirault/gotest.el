@@ -49,6 +49,38 @@
   :type 'boolean
   :group 'gotest)
 
+(defvar go-test-compilation-error-regexp-alist-alist
+  '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
+    (go-test-testify . ("^\tLocation:\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\)$" 1 2)) ;; testify package assert
+    (go-test-gopanic . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\) \\+0x\\(?:[0-9a-f]+\\)" 1 2)) ;; panic()
+    (go-test-compile . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\):\\([0-9]+\\): .*$" 1 2 3)) ;; go compiler
+    (go-test-linkage . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): undefined: .*$" 1 2))) ;; go linker
+  "Alist of values for `go-test-compilation-error-regexp-alist'.
+See also: `compilation-error-regexp-alist-alist'.")
+
+(defcustom go-test-compilation-error-regexp-alist
+  '(go-test-testing
+    go-test-testify
+    go-test-gopanic
+    go-test-compile
+    go-test-linkage)
+  "Alist that specifies how to match errors in go test output.
+The default set of regexps should only match the output of the
+standard `go' tool, which includes compile, link, stacktrace (panic)
+and package testing.  There is support for matching error output
+from other packages, such as `testify'.
+
+Only file names ending in `.go' will be matched by default.
+
+Instead of an alist element, you can use a symbol, which is
+looked up in `go-testcompilation-error-regexp-alist-alist'.
+
+See also: `compilation-error-regexp-alist'.
+"
+  :type '(repeat (choice (symbol :tag "Predefined symbol")
+			 (sexp :tag "Error specification")))
+  :group 'gotest)
+
 
 ;; Commands
 ;; -----------
@@ -101,8 +133,17 @@
     opts))
 
 
+(defun go-test-compilation-hook (p)
+  (set (make-local-variable 'compilation-error-regexp-alist-alist)
+       go-test-compilation-error-regexp-alist-alist)
+  (set (make-local-variable 'compilation-error-regexp-alist)
+       go-test-compilation-error-regexp-alist))
+
+
 (defun go-test-run (args)
-  (compile (go-test-get-program (go-test-arguments args))))
+  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  (compile (go-test-get-program (go-test-arguments args)))
+  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
 
 ; API
