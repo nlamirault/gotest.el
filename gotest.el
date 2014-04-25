@@ -100,6 +100,18 @@ See also: `compilation-error-regexp-alist'.
                          "./")))))
 
 
+(defun go-test-get-current-buffer ()
+  "Return the test buffer for the current `buffer-file-name'.
+If `buffer-file-name' ends with `_test.go', `current-buffer' is returned.
+Otherwise, `ff-other-file-name' is used to find the test buffer.
+For example, if the current buffer is `foo.go', the buffer for
+`foo_test.go' is returned."
+  (if (string-match "_test\.go$" buffer-file-name)
+      (current-buffer)
+    (let ((ff-always-try-to-create nil))
+      (find-file-noselect (ff-other-file-name)))))
+
+
 (defun go-test-get-current-test ()
   (let ((start (point))
         test-name)
@@ -117,13 +129,14 @@ See also: `compilation-error-regexp-alist'.
 
 (defun go-test-get-current-file-tests ()
   "Generate regexp to match tests in the current buffer."
-  (save-excursion
-    (goto-char (point-min))
-    (let (tests)
-      (while (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
-        (let ((test (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
-          (setq tests (append tests (list test)))))
-      (mapconcat 'identity tests "|"))))
+  (with-current-buffer (go-test-get-current-buffer)
+   (save-excursion
+     (goto-char (point-min))
+     (let (tests)
+       (while (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
+         (let ((test (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
+           (setq tests (append tests (list test)))))
+       (mapconcat 'identity tests "|")))))
 
 
 (defun go-test-arguments (args)
