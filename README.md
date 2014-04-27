@@ -1,5 +1,9 @@
 # gotest.el
 
+## Deprecated
+
+See [Cerbere](https://github.com/nlamirault/cerbere)
+
 Manage the [GO](http://golang.org) tests from Emacs.
 
 ## Installation
