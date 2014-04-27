@@ -1,10 +1,10 @@
 # gotest.el
 
+Manage the [GO](http://golang.org) tests from Emacs.
+
 ## Deprecated
 
 See [Cerbere](https://github.com/nlamirault/cerbere)
-
-Manage the [GO](http://golang.org) tests from Emacs.
 
 ## Installation
 
