@@ -64,5 +64,34 @@
   (with-current-buffer (find-file-noselect testsuite-buffer-name)
     (should (string= "TestFoo|TestBar|Test_Baz" (go-test-get-current-file-tests)))))
 
+;; Error Regexp
+
+(ert-deftest test-go-test-compilation-error-regexp-matches ()
+  (let ((tests '((go-test-testing . ("	foo_test.go:146: some message"))
+                 (go-test-testify . ("	Location:	foo_test.go:66"))
+                 (go-test-gopanic . ("	/some/path/foo_test.go:266 +0xb6"))
+                 (go-test-compile . ("foo_test.go:51:50: expected operand, found '}'"))
+                 (go-test-linkage . ("./foo_test.go:174: undefined: foo.Symbol")))))
+    (dolist (item tests)
+      (let* ((type (car item))
+             (regex (nth 1 (assq type
+                                 go-test-compilation-error-regexp-alist-alist))))
+        (dolist (msg (cdr item))
+          (should (string-match regex msg)))))))
+
+(ert-deftest test-go-test-compilation-error-regexp-matches-not ()
+  (let ((tests '((go-test-testing . ("	foo_test.go some message"
+                                     "./foo_test.go:174: undefined: foo.Symbol"))
+                 (go-test-testify . ("	Location:	foo_test.go"))
+                 (go-test-gopanic . ("	/usr/local/go/src/pkg/runtime/panic.c:266 +0xb6"))
+                 (go-test-compile . ("./foo_test.go:174: undefined: foo.Symbol"))
+                 (go-test-linkage . ("./foo_test.go:174: redefined: foo.Symbol")))))
+    (dolist (item tests)
+      (let* ((type (car item))
+             (regex (nth 1 (assq type
+                                 go-test-compilation-error-regexp-alist-alist))))
+        (dolist (msg (cdr item))
+          (should (not (string-match regex msg))))))))
+
 (provide 'gotest-test)
 ;;; gotest-test.el ends here
