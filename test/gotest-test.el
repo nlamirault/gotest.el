@@ -64,6 +64,16 @@
   (with-current-buffer (find-file-noselect testsuite-buffer-name)
     (should (string= "TestFoo|TestBar|Test_Baz" (go-test-get-current-file-tests)))))
 
+;; when current buffer 'go.go', Test names should be found in 'go_test.go'
+(ert-deftest test-go-test-get-current-file-tests-other ()
+  (with-current-buffer (find-file-noselect (concat testsuite-dir "go.go"))
+    (should (string= "TestFoo|TestBar|Test_Baz" (go-test-get-current-file-tests)))))
+
+;; 'no_test.go' does not exist, should-error
+(ert-deftest test-go-test-get-current-file-tests-other-enoent ()
+  (with-current-buffer (find-file-noselect (concat testsuite-dir "no.go"))
+    (should-error (go-test-get-current-file-tests))))
+
 ;; Error Regexp
 
 (ert-deftest test-go-test-compilation-error-regexp-matches ()
