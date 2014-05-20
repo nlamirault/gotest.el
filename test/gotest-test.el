@@ -40,6 +40,9 @@
 (defun go-test-command (&rest arg)
   (apply 's-concat "go test " arg))
 
+(defun go-run-command (&rest arg)
+  (apply 's-concat "go run " arg))
+
 
 ;; Arguments
 
@@ -47,10 +50,38 @@
   (should (string= (go-test-command)
 		   (go-test-get-program (go-test-arguments "")))))
 
+(ert-deftest test-go-test-get-program-with-args ()
+  (let ((go-test-args "-race"))
+    (should (string= (go-test-command " -race")
+                     (go-test-get-program (go-test-arguments ""))))))
+
 (ert-deftest test-go-test-add-verbose-argument ()
   (let ((go-test-verbose t))
     (should (string= (go-test-command " -v")
-		     (go-test-get-program (go-test-arguments ""))))))
+		     (go-test-get-program (go-test-arguments ""))))
+    (let ((go-test-args "-race"))
+      (should (string= (go-test-command " -v -race")
+                       (go-test-get-program (go-test-arguments "")))))))
+
+(ert-deftest test-go-run-command-without-args ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (should (string= (go-run-command testsuite-buffer-name)
+                     (go-run-get-program (go-run-arguments))))))
+
+(ert-deftest test-go-run-command-with-args ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (let ((go-run-args "-foo -bar=x"))
+      (should (string= (go-run-command (s-concat testsuite-buffer-name " -foo -bar=x"))
+                      (go-run-get-program (go-run-arguments)))))))
+
+(ert-deftest test-go-run-command-with-prefix ()
+  (with-current-buffer (find-file-noselect testsuite-buffer-name)
+    (let ((current-prefix-arg '-)
+          (go-run-args "-baz")
+          (go-run-history (mapcar (lambda (arg) (s-concat buffer-file-name " " arg))
+                                  '("-foo" "-bar" "-biz"))))
+      (should (string= (go-run-command (s-concat testsuite-buffer-name " -foo"))
+                       (go-run-get-program (go-run-arguments)))))))
 
 ;; Find
 
