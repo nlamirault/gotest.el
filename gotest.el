@@ -39,10 +39,19 @@
   "GoTest utility"
   :group 'go)
 
-(defcustom go-test-args ""
-  "Argument to pass to go."
-  :type 'string
-  :group 'gotest)
+(defvar-local go-test-args nil
+  "Arguments to pass to go test.
+  This variable is buffer-local, set using .dir-locals.el for example.")
+
+(defvar-local go-run-args nil
+  "Arguments to pass to go run.
+  This variable is buffer-local, set using .dir-locals.el for example.")
+
+(defvar go-test-history nil
+  "History list for go test command arguments.")
+
+(defvar go-run-history nil
+  "History list for go run command arguments.")
 
 (defcustom go-test-verbose nil
   "Display debugging information during test execution."
@@ -91,6 +100,21 @@ See also: `compilation-error-regexp-alist'.
   (s-concat go-command " test "
             ;;(go-test-get-root-directory)
             args))
+
+
+(defun go-test-get-arguments (defaults history)
+  "Get optional arguments for go test or go run.
+DEFAULTS will be used when there is no prefix argument.
+When a prefix argument of '- is given, use the most recent HISTORY item.
+When any other prefix argument is given, prompt for arguments using HISTORY."
+  (if current-prefix-arg
+      (if (equal current-prefix-arg '-)
+          (car (symbol-value history))
+        (let* ((name (nth 1 (s-split "-" (symbol-name history))))
+               (prompt (s-concat "go " name " args: ")))
+          (read-shell-command prompt defaults history)))
+    defaults))
+
 
 (defun go-test-get-root-directory()
   "Return the root directory to run tests."
@@ -143,7 +167,9 @@ For example, if the current buffer is `foo.go', the buffer for
   (let ((opts args))
     (when go-test-verbose
       (setq opts (s-concat opts " -v")))
-    opts))
+    (when go-test-args
+      (setq opts (s-concat opts " " go-test-args)))
+    (go-test-get-arguments opts 'go-test-history)))
 
 
 (defun go-test-compilation-hook (p)
@@ -159,34 +185,56 @@ For example, if the current buffer is `foo.go', the buffer for
   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
 
+(defun go-run-get-program (args)
+  "Return the command to launch go run.
+`ARGS' corresponds to go command line arguments."
+  (s-concat go-command " run " args))
+
+
+(defun go-run-arguments ()
+  "Arguments for go run."
+  (let ((opts (if go-run-args
+                  (s-concat buffer-file-name " " go-run-args)
+                buffer-file-name)))
+    (go-test-get-arguments opts 'go-run-history)))
+
+
 ; API
 ;; ----
 
 
 ;;;###autoload
 (defun go-test-current-test ()
-  "Launch go test on curent test."
+  "Launch go test on the current test."
   (interactive)
   (let ((test-name (go-test-get-current-test)))
     (when test-name
-      (let ((args (s-concat " -run " test-name)))
+      (let ((args (s-concat "-run " test-name)))
       (go-test-run args)))))
 
 
 ;;;###autoload
 (defun go-test-current-file ()
-  "Launch go test on file."
+  "Launch go test on the current buffer file."
   (interactive)
-  (let ((args (s-concat " -run='" (go-test-get-current-file-tests) "'")))
+  (let ((args (s-concat "-run='" (go-test-get-current-file-tests) "'")))
     (go-test-run args)))
 
 
 ;;;###autoload
 (defun go-test-current-project ()
-  "Launch go test on project."
+  "Launch go test on the current project."
   (interactive)
-  (go-test-run ""))
+  (go-test-run "./..."))
 
+
+;;;###autoload
+(defun go-run ()
+  "Launch go run on current buffer file."
+  (interactive)
+  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  (compile (go-run-get-program (go-run-arguments)))
+  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
 (provide 'gotest)
 ;;; gotest.el ends here
