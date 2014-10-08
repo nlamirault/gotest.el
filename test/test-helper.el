@@ -27,10 +27,14 @@
 ;;; Code:
 
 (require 'f)
+(require 'undercover)
+
 
 (setq debugger-batch-max-lines (+ 50 max-lisp-eval-depth)
       debug-on-error t)
 
+;; (let ((undercover-force-coverage t))
+;;   (undercover "gotest.el"))
 
 (defconst go-test-testsuite-dir (f-parent (f-this-file))
   "The testsuite directory.")
@@ -44,6 +48,10 @@
 (message "Load gotest : %s" go-test-source-dir)
 (load (s-concat go-test-source-dir "/gotest.elc"))
 
+
+;; (defadvice undercover--report-on-kill (around self-report activate)
+;;   (let ((undercover--files (list (file-truename "gotest.el"))))
+;;     ad-do-it))
 
 
 (provide 'test-helper)
