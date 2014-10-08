@@ -56,7 +56,7 @@ use the most recent arguments without prompting.  The go file is
 included in history, so you can `go-run` from history regardless of
 which buffer you are currently visiting.
 
-### Example key bindings
+## Example key bindings
 
 You can create some key bindings with these commands:
 
