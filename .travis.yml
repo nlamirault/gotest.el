@@ -11,4 +11,4 @@ before_install:
 install:
   - cask install
 script:
-  - cask exec ert-runner
+  - make clean build test
