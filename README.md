@@ -1,18 +1,18 @@
 # gotest.el
 
+[![License GPL 3][badge-license]][COPYING]
+[![travis][badge-travis]][travis]
+[![drone][badge-drone]][drone]
+
 Run [Go](http://golang.org) tests and programs from Emacs.
 
 ## Installation
 
-The recommended way to install ``gotest.el`` is via [MELPA](http://melpa.milkbox.net/):
+The recommended way to install ``gotest.el`` is via [MELPA][]:
 
     M-x package-install gotest.el
 
-Or [el-get](http://tapoueh.org/emacs/el-get.html):
-
-    M-x el-get-install go-test
-
-or [Cask](https://github.com/cask/cask):
+or [Cask][]:
 
 	(depends-on "gotest.el")
 
@@ -72,7 +72,7 @@ You can create some key bindings with these commands:
 
 ### Cask
 
-``gotest.el`` use [Cask](https://github.com/cask/cask) for dependencies
+``gotest.el`` use [Cask][] for dependencies
 management. Install it and retrieve dependencies :
 
     $ curl -fsSkL https://raw.github.com/cask/cask/master/go | python
@@ -106,3 +106,13 @@ See [LICENSE](LICENSE).
 ## Contact
 
 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+
+[gotest]: https://github.com/nlamirault/gotest.el
+[badge-license]: https://img.shields.io/badge/license-GPL_2-green.svg?style=flat
+[LICENSE]: https://github.com/nlamirault/gotest.el/blob/master/LICENSE
+[travis]: https://travis-ci.org/nlamirault/gotest.el
+[badge-travis]: http://img.shields.io/travis/nlamirault/gotest.el.svg?style=flat
+[GNU Emacs]: https://www.gnu.org/software/emacs/
+[MELPA]: http://melpa.milkbox.net/
+[Cask]: http://cask.github.io/
+[Issue tracker]: https://github.com/nlamirault/gotest.el/issues
