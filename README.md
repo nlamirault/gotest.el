@@ -1,8 +1,7 @@
 # gotest.el
 
-[![License GPL 3][badge-license]][COPYING]
+[![License GPL 3][badge-license]][LICENSE]
 [![travis][badge-travis]][travis]
-[![drone][badge-drone]][drone]
 
 Run [Go](http://golang.org) tests and programs from Emacs.
 
