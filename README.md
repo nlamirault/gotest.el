@@ -2,6 +2,7 @@
 
 [![License GPL 3][badge-license]][LICENSE]
 [![travis][badge-travis]][travis]
+[![Melpa Status](http://melpa.milkbox.net/packages/gotest.el-badge.svg)](http://melpa.milkbox.net/#/gotest.el)
 
 Run [Go](http://golang.org) tests and programs from Emacs.
 
