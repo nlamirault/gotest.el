@@ -32,7 +32,7 @@
     ;;(message "Go-Test.el : %s" lib-version)
     (message "GoTest.el Cask version: %s" cask-version)
     ;;(should (string= version (go-test-mode-library-version)))))
-    (should (string= "0.1.0" cask-version))))
+    (should (string= "0.2.0" cask-version))))
 
 
 
