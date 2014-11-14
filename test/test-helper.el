@@ -30,14 +30,10 @@
 (require 'f)
 (require 'undercover)
 
-
 (setq debugger-batch-max-lines (+ 50 max-lisp-eval-depth)
       debug-on-error t)
 
 (defvar username (getenv "HOME"))
-
-;; (let ((undercover-force-coverage t))
-;;   (undercover "gotest.el"))
 
 (defconst go-test-testsuite-dir
   (f-parent (f-this-file))
@@ -62,8 +58,19 @@
 
 (defun load-unit-tests (path)
   "Load all unit test from PATH."
+  (message (ansi-green "[gotest] Execute unit tests %s"
+                       path))
   (dolist (test-file (or argv (directory-files path t "-test.el$")))
     (load test-file nil t)))
+
+
+(defun load-library (file)
+  "Load current library from FILE."
+  (let ((path (s-concat go-test-source-dir file)))
+    (message (ansi-yellow "[gotest] Load library from %s" path))
+    (undercover "*.el" (:exclude "*-test.el"))
+    (require 'gotest path)))
+
 
 ;;(message "Running tests on Emacs %s" emacs-version)
 

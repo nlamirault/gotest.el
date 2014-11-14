@@ -32,10 +32,7 @@
              ;; (unless (f-dir? go-test-sandbox-path)
              ;;   (f-mkdir go-test-sandbox-path))
              (cleanup-load-path)
-             (message (ansi-yellow "[gotest] Load library"))
-             (require 'gotest (s-concat go-test-source-dir "/gotest.el"))
-             (message (ansi-green "[gotest] Execute unit tests %s"
-                                  go-test-testsuite-dir))
+             (load-library "/gotest.el")
              ,@body)
          )))
          ;; (error
