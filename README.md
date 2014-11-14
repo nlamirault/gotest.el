@@ -2,6 +2,7 @@
 
 [![License GPL 3][badge-license]][LICENSE]
 [![travis][badge-travis]][travis]
+[![drone][badge-drone]][drone]
 [![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
 [![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png)](https://coveralls.io/r/nlamirault/gotest.el)
@@ -114,6 +115,8 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [LICENSE]: https://github.com/nlamirault/gotest.el/blob/master/LICENSE
 [travis]: https://travis-ci.org/nlamirault/gotest.el
 [badge-travis]: http://img.shields.io/travis/nlamirault/gotest.el.svg?style=flat
+[badge-drone]: https://drone.io/github.com/nlamirault/gotest.el/status.png
+[drone]: https://drone.io/github.com/nlamirault/gotest.el/latest
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [MELPA]: http://melpa.milkbox.net/
 [Cask]: http://cask.github.io/
