@@ -1,14 +1,34 @@
-language: emacs-lisp
-env:
-  - EMACS=emacs24 EMACS_REPO=cassou/emacs
-  - EMACS=emacs-snapshot EMACS_REPO=ubuntu-elisp/ppa
+language: ruby
 before_install:
-  - sudo add-apt-repository -y ppa:$EMACS_REPO
-  - sudo apt-get update
-  - sudo apt-get -y install $EMACS
-  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+  - sudo apt-get install gcc automake texinfo libmagick++-dev libgtk2.0-dev libxft-dev libgnutls-dev libdbus-1-dev libgif-dev libxpm-dev
+  - sudo mkdir -p /usr/local/evm
+  - sudo chown travis:travis /usr/local/evm
+  - curl -fsSkL https://gist.github.com/rejeep/7736123/raw | sh
   - export PATH="/home/travis/.cask/bin:$PATH"
-install:
-  - cask install
+  - export PATH="/home/travis/.evm/bin:$PATH"
+  - if [ -n "$EVM_EMACS" ]; then
+       evm install --skip $EVM_EMACS
+       evm use $EVM_EMACS
+    fi
+  - if [ "$EMACS" = "emacs24" ]; then
+        sudo add-apt-repository -y ppa:cassou/emacs &&
+        sudo apt-get update -qq &&
+        sudo apt-get install -qq emacs24 emacs24-el;
+    fi
+  - if [ "$EMACS" = "emacs-snapshot" ]; then
+        sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
+        sudo apt-get update -qq &&
+        sudo apt-get install -qq emacs-snapshot &&
+        sudo apt-get install -qq emacs-snapshot-el;
+    fi
+rvm:
+  - 1.9.3
+env:
+    - EVM_EMACS=emacs-24.3-bin
+    - EVM_EMACS=emacs-24.4-bin
+    # - EVM_EMACS=emacs-git-snapshot
+    - EMACS=emacs24
+    - EMACS=emacs-snapshot
 script:
-  - make clean build test
+  # - ./scame --init --emacs=emacs-24.3-bin && emacs --version && ./scame --cmd=install && make local-test
+    - make integration-test

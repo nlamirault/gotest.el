@@ -13,18 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+APP = gotest
 
-EMACS = emacs
-EMACSFLAGS =
+EMACS ?= emacs
+EMACSFLAGS = --debug-init -L .
 CASK = cask
+EVM = evm
 VAGRANT = vagrant
 
-OBJECTS = gotest.elc
+ELS = $(wildcard *.el)
+OBJECTS = $(ELS:.el=.elc)
 
 VERSION=$(shell \
         grep Version gotest.el \
-        |awk -F':' '{print $$2}' \
-	|sed -e "s/[^0-9.]//g")
+	|awk -F'"' '{print $$2}')
+
 
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
@@ -34,43 +37,39 @@ WARN_COLOR=\033[33;01m
 all: help
 
 help:
-	@echo -e "$(OK_COLOR) ==== gotest.el [$(VERSION)]====$(NO_COLOR)"
-	@echo -e "$(WARN_COLOR)- build$(NO_COLOR)    : make gotest.el"
-	@echo -e "$(WARN_COLOR)- test$(NO_COLOR)     : launch unit tests"
-	@echo -e "$(WARN_COLOR)- clean$(NO_COLOR)    : cleanup"
-
-elpa:
-	@echo -e "$(OK_COLOR)[gotest.el] Build$(NO_COLOR)"
-	@$(CASK) install
-	@$(CASK) update
-	@touch $@
+	@echo -e "$(OK_COLOR) ==== $(APP) [$(VERSION)]====$(NO_COLOR)"
+	@echo -e "$(WARN_COLOR)- test$(NO_COLOR)                   : launch unit tests$(NO_COLOR)"
+	@echo -e "$(WARN_COLOR)- integration-test$(NO_COLOR)       : launch integration tests$(NO_COLOR)"
+	@echo -e "$(WARN_COLOR)- clean$(NO_COLOR)                  : clean Scame installation$(NO_COLOR)"
+	@echo -e "$(WARN_COLOR)- reset$(NO_COLOR)                  : remote Scame dependencies for development$(NO_COLOR)"
 
 .PHONY: build
-build : elpa $(OBJECTS)
+build :
+	@$(CASK) install
+	@$(CASK) update
 
-.PHONY: test
+.PHONY: local-test
 test : build
-	@echo -e "$(OK_COLOR)[gotest.el] Unit tests$(NO_COLOR)"
-	@${CASK} exec ert-runner # --no-win
+	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
+	$(EMACSFLAGS) \
+	-l test/run-tests
 
-.PHONY: ci
-ci : build
-	@${CASK} exec ert-runner --no-win < /dev/tty
-
-.PHONY: virtual-test
-virtual-test :
-	@$(VAGRANT) up
-	@$(VAGRANT) ssh -c "make -C /vagrant EMACS=$(EMACS) clean test"
+.PHONY: integration-test
+integration-test: build
+	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
+	$(EMACSFLAGS) \
+	-l test/run-global-tests
 
 .PHONY: clean
 clean :
-	@echo -e "$(OK_COLOR)[gotest.el] Cleanup$(NO_COLOR)"
-	@rm -fr $(OBJECTS) elpa *.pyc
+	@$(CASK) clean-elc
+	rm -fr dist
 
 reset : clean
 	@rm -rf .cask # Clean packages installed for development
+	@rm -fr test/sandbox
 
 %.elc : %.el
 	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
-		$(EMACSFLAGS) \
-		-f batch-byte-compile $<
+	$(EMACSFLAGS) \
+	-f batch-byte-compile $<

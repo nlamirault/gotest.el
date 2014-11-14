@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'ansi)
 (require 'f)
 (require 'undercover)
 
@@ -33,20 +34,41 @@
 (setq debugger-batch-max-lines (+ 50 max-lisp-eval-depth)
       debug-on-error t)
 
+(defvar username (getenv "HOME"))
+
 ;; (let ((undercover-force-coverage t))
 ;;   (undercover "gotest.el"))
 
-(defconst go-test-testsuite-dir (f-parent (f-this-file))
+(defconst go-test-testsuite-dir
+  (f-parent (f-this-file))
   "The testsuite directory.")
 
 (defconst go-test-source-dir
   (f-parent go-test-testsuite-dir)
   "The gotest.el source directory.")
 
-(message "Running tests on Emacs %s" emacs-version)
+(defconst go-test-sandbox-path
+  (f-expand "sandbox" go-test-testsuite-dir)
+  "The sandbox path for gotest.")
 
-(message "Load gotest : %s" go-test-source-dir)
-(load (s-concat go-test-source-dir "/gotest.elc"))
+(defun cleanup-load-path ()
+  "Remove home directory from 'load-path."
+  (message (ansi-green "[gotest] Cleanup path"))
+  (mapc #'(lambda (path)
+            (when (string-match (s-concat username "/.emacs.d") path)
+              (message (ansi-yellow "Suppression path %s" path))
+              (setq load-path (delete path load-path))))
+        load-path))
+
+(defun load-unit-tests (path)
+  "Load all unit test from PATH."
+  (dolist (test-file (or argv (directory-files path t "-test.el$")))
+    (load test-file nil t)))
+
+;;(message "Running tests on Emacs %s" emacs-version)
+
+;; (message "Load gotest : %s" go-test-source-dir)
+;; (load (s-concat go-test-source-dir "/gotest.elc"))
 
 
 ;; (defadvice undercover--report-on-kill (around self-report activate)

@@ -1,4 +1,4 @@
-;;; go-test-version-test.el --- Tests for version information
+;;; gotest-version-test.el --- Tests for version information
 
 ;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -21,20 +21,16 @@
 
 ;;; Code:
 
-(require 'test-helper)
+;; Use pkg-info
+;; (ert-deftest go-test-mode-library-version ()
+;;   :expected-result (if (executable-find "cask") :passed :failed)
+;;   ;;  The default directory must end with a slash
+;;   (let* ((cask-version (car (process-lines "cask" "version")))
+;; 	 (lib-version (go-test-mode-library-version)))
+;;     (message (ansi-yellow "Go-Test.el : %s" lib-version))
+;;     (message (ansi-yellow "GoTest.el Cask version: %s" cask-version))
+;;     ;;(should (string= version (go-test-mode-library-version)))))
+;;     (should (string= "0.2.0" cask-version))))
 
-(ert-deftest go-test-mode-library-version ()
-  :expected-result (if (executable-find "cask") :passed :failed)
-  ;;  The default directory must end with a slash
-  (let* ((cask-version (car (process-lines "cask" "version")))
-	 ;;(lib-version (go-test-mode-library-version)))
-	 )
-    ;;(message "Go-Test.el : %s" lib-version)
-    (message "GoTest.el Cask version: %s" cask-version)
-    ;;(should (string= version (go-test-mode-library-version)))))
-    (should (string= "0.2.0" cask-version))))
-
-
-
-(provide 'go-test-version-test)
-;;; go-test-version-test.el ends here
+(provide 'gotest-version-test)
+;;; gotest-version-test.el ends here
