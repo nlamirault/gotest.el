@@ -26,8 +26,8 @@ OBJECTS = $(ELS:.el=.elc)
 
 VERSION=$(shell \
         grep Version gotest.el \
-	|awk -F'"' '{print $$2}')
-
+	|awk -F': ' '{print $$2}' \
+	|sed -e "s/[^0-9.]//g")
 
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
