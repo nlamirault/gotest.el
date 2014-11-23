@@ -1,35 +1,153 @@
+###
+### Notes
+###
+### The travis web interface may choke silently and fail to
+### update when there are issues with the .travis.yml file.
+###
+### The "travis-lint" command-line tool does not catch all
+### errors which may lead to silent failure.
+###
+### Shell-style comments in this file must have "#" as the
+### *first* character of the line.
+###
+
+###
+### language
+###
+
 language: emacs-lisp
-before_install:
-#   - sudo apt-get install gcc automake texinfo libmagick++-dev libgtk2.0-dev libxft-dev libgnutls-dev libdbus-1-dev libgif-dev libxpm-dev
-#   - sudo mkdir -p /usr/local/evm
-#   - sudo chown travis:travis /usr/local/evm
-#   - curl -fsSkL https://gist.github.com/rejeep/7736123/raw | sh
-#   - export PATH="/home/travis/.cask/bin:$PATH"
-#   - export PATH="/home/travis/.evm/bin:$PATH"
-#   - if [ -n "$EVM_EMACS" ]; then evm install --skip $EVM_EMACS && evm use $EVM_EMACS ; fi
-#   - if [ "$EMACS" = "emacs24" ]; then sudo add-apt-repository -y ppa:cassou/emacs && sudo apt-get update -qq && sudo apt-get install -qq emacs24 emacs24-el; fi
-#   - if [ "$EMACS" = "emacs-snapshot" ]; then sudo add-apt-repository -y ppa:ubuntu-elisp/ppa && sudo apt-get update -qq && sudo apt-get install -qq emacs-snapshot emacs-snapshot-el; fi
-# rvm:
-#   - 1.9.3
-# env:
-#     - EVM_EMACS=emacs-24.3-bin
-#     - EVM_EMACS=emacs-24.4-bin
-#     # - EVM_EMACS=emacs-git-snapshot
-#     - EMACS=emacs24
-#     - EMACS=emacs-snapshot
-before_install:
-  # Stable Emacs 24.3
-  - sudo add-apt-repository -y ppa:cassou/emacs
-  # Nightly Emacs snapshot builds
-  - sudo add-apt-repository -y ppa:ubuntu-elisp/ppa
-  # Update and install the Emacs for our environment
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq -yy ${EMACS}-nox
-  # Install and bootstrap cask
+
+###
+### defining the build matrix
+###
+### ===>                                                       <===
+### ===> each variation in env/matrix will be built and tested <===
+### ===>                                                       <===
+###
+### variables under env/global are available to the build process
+### but don't cause the creation of a separate variation
+###
+
+env:
+  # - EMACS=emacs-23.4-bin METHOD=evm
+  - EMACS=emacs-24.1-bin METHOD=evm
+  - EMACS=emacs-24.2-bin METHOD=evm
+  - EMACS=emacs-24.3-bin METHOD=evm
+  - EMACS=emacs24 METHOD=manual
+  - EMACS=emacs-snapshot METHOD=manual
+
+###
+### allowing build failures
+###
+
+# matrix:
+#   fast_finish: true
+#   allow_failures:
+#     - env: EMACS=emacs-23.4-bin METHOD=evm
+
+###
+### limit build attempts to defined branches
+###
+### notes
+###
+### This controls which branches are built.
+###
+### You can also control which branches affect the web badge, by
+### appending "?branch=master,staging,production" to the end of the
+### image URL (replacing "master,staging,production" with a
+### comma-separated list of branches to be reflected in the badge).
+###
+#
+#  branches:
+#    only:
+#      - master
+#
+
+###
+### runtime initialization
+###
+### notes
+###
+### emacs22 is extracted manually from Ubuntu Maverick.
+###
+### emacs23 is the stock default, but is updated anyway to
+### a GUI-capable version, which will have certain additional
+### functions compiled in.
+###
+### emacs24 (current stable release) is obtained from the
+### cassou PPA: http://launchpad.net/~cassou/+archive/emacs
+###
+### emacs-snapshot (trunk) is obtained from the Ubuntu Emacs Lisp PPA:
+### https://launchpad.net/~ubuntu-elisp/+archive/ppa
+### For the emacs-snapshot build, bleeding-edge versions
+### of all test dependencies are also used.
+###
+
+# before_install:
+#   - git submodule --quiet update --init --recursive
+
+install:
+  - if [ "$METHOD" = 'evm' ]; then
+        sudo mkdir /usr/local/evm &&
+        sudo chown travis:travis /usr/local/evm &&
+        sudo add-apt-repository -y ppa:cassou/emacs &&
+        sudo apt-get update -qq &&
+        sudo apt-get build-dep -qq emacs24 &&
+        curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash &&
+        export PATH="~/.evm/bin:$PATH" &&
+        chmod +x ~/.evm/bin/evm &&
+        ~/.evm/bin/evm install $EMACS &&
+        ~/.evm/bin/evm use $EMACS &&
+        FULL_EMACS_PATH="/usr/local/evm/$EMACS/bin/emacs" &&
+        export EMACS="$FULL_EMACS_PATH" &&
+        EMACS="$FULL_EMACS_PATH";
+    fi
+  - if [ "$EMACS" = 'emacs24' ]; then
+        sudo add-apt-repository -y ppa:cassou/emacs &&
+        sudo apt-get -qq update &&
+        sudo apt-get -qq -f install &&
+        sudo apt-get -qq install emacs24 emacs24-el;
+    fi
+  - if [ "$EMACS" = 'emacs-snapshot' ]; then
+        sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
+        sudo apt-get -qq update &&
+        sudo apt-get -qq -f install &&
+        sudo apt-get -qq install emacs-snapshot &&
+        sudo apt-get -qq install emacs-snapshot-el;
+    fi
   - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
   - export PATH="${HOME}/.cask/bin:$PATH"
-env:
-  - EMACS=emacs24
-  - EMACS=emacs-snapshot
+
+
+before_script:
+#   - if [ "$EMACS" = 'emacs-snapshot' ]; then
+#         make downloads-latest;
+#     else
+#         make downloads;
+#     fi
+
+###
+### the actual build/test command
+###
+### Use "make test-batch" to test without byte-compiling.
+### The default command avoids byte-compiling on Emacs 22.
+###
+
 script:
-    - make integration-test
+  echo "Method is $METHOD " && $EMACS --version && EMACS="$EMACS" make integration-test
+
+###
+### settings
+###
+
+# notifications:
+#   email: false
+
+#
+# Emacs
+#
+# Local Variables:
+# indent-tabs-mode: nil
+# coding: utf-8
+# End:
+#
