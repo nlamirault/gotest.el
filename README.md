@@ -7,7 +7,7 @@
 [![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
 
-Run [Go](http://golang.org) tests and programs from Emacs.
+Run [Go](http://golang.org) tests and programs from Emacs (>= 24.3)
 
 ## Installation
 
