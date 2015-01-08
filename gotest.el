@@ -138,15 +138,21 @@ For example, if the current buffer is `foo.go', the buffer for
 
 (defun go-test-get-current-test ()
   (let ((start (point))
+        test-prefix
         test-name)
     (save-excursion
       (end-of-line)
+      (setq test-prefix "Test")
       (unless (and
-               (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test" nil t)
+               (or
+                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test" nil t)
+                (and
+                 (setq test-prefix "Example")
+                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example" nil t)))
                (save-excursion (go-end-of-defun) (< start (point))))
         (error "Unable to find a test"))
       (save-excursion
-        (search-forward "Test")
+        (search-forward test-prefix)
         (setq test-name (thing-at-point 'word))))
     test-name))
 
@@ -156,11 +162,14 @@ For example, if the current buffer is `foo.go', the buffer for
   (with-current-buffer (go-test-get-current-buffer)
    (save-excursion
      (goto-char (point-min))
+     (if (string-match "\.go$" buffer-file-name)
      (let (tests)
-       (while (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
+       (while (or
+               (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
+               (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Example[^(]+\\)" nil t))
          (let ((test (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
            (setq tests (append tests (list test)))))
-       (mapconcat 'identity tests "|")))))
+       (mapconcat 'identity tests "|"))))))
 
 
 (defun go-test-arguments (args)
