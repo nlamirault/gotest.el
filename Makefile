@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+# Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,18 +16,20 @@
 APP = gotest
 
 EMACS ?= emacs
-EMACSFLAGS = --debug-init -L .
+EMACSFLAGS = -L .
 CASK = cask
-EVM = evm
 VAGRANT = vagrant
-
-ELS = $(wildcard *.el)
-OBJECTS = $(ELS:.el=.elc)
 
 VERSION=$(shell \
         grep Version gotest.el \
-	|awk -F': ' '{print $$2}' \
+        |awk -F':' '{print $$2}' \
 	|sed -e "s/[^0-9.]//g")
+
+PACKAGE_FOLDER=$(APP)-$(VERSION)
+ARCHIVE=$(PACKAGE_FOLDER).tar
+
+ELS = $(wildcard *.el)
+OBJECTS = $(ELS:.el=.elc)
 
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
@@ -37,39 +39,61 @@ WARN_COLOR=\033[33;01m
 all: help
 
 help:
-	@echo -e "$(OK_COLOR) ==== $(APP) [$(VERSION)]====$(NO_COLOR)"
-	@echo -e "$(WARN_COLOR)- test$(NO_COLOR)                   : launch unit tests$(NO_COLOR)"
-	@echo -e "$(WARN_COLOR)- integration-test$(NO_COLOR)       : launch integration tests$(NO_COLOR)"
-	@echo -e "$(WARN_COLOR)- clean$(NO_COLOR)                  : clean Scame installation$(NO_COLOR)"
-	@echo -e "$(WARN_COLOR)- reset$(NO_COLOR)                  : remote Scame dependencies for development$(NO_COLOR)"
+	@echo -e "$(OK_COLOR)==== $(APP) [$(VERSION)]====$(NO_COLOR)"
+	@echo -e "$(WARN_COLOR)- init$(NO_COLOR)    : initialize development environment"
+	@echo -e "$(WARN_COLOR)- build$(NO_COLOR)   : build project"
+	@echo -e "$(WARN_COLOR)- test$(NO_COLOR)    : launch unit tests"
+	@echo -e "$(WARN_COLOR)- clean$(NO_COLOR)   : cleanup"
+	@echo -e "$(WARN_COLOR)- package$(NO_COLOR) : packaging"
 
-.PHONY: build
-build :
+init:
+	@echo -e "$(OK_COLOR)[$(APP)] Initialize environment$(NO_COLOR)"
+        @echo -e "Emacs version : $(EMACS) --version"
+	@$(CASK) --dev install
+
+elpa:
+	@echo -e "$(OK_COLOR)[$(APP)] Build$(NO_COLOR)"
 	@$(CASK) install
 	@$(CASK) update
+	@touch $@
 
-.PHONY: local-test
-test : build
-	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
-	$(EMACSFLAGS) \
-	-l test/run-tests
+.PHONY: build
+build : elpa $(OBJECTS)
 
-.PHONY: integration-test
-integration-test: build
-	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
-	$(EMACSFLAGS) \
-	-l test/run-global-tests
+test: build
+	@echo -e "$(OK_COLOR)[$(APP)] Unit tests$(NO_COLOR)"
+	@$(CASK) exec ert-runner
+
+.PHONY: virtual-test
+virtual-test: check-env
+	@$(VAGRANT) up
+	@$(VAGRANT) ssh -c "source /tmp/.emacs-gotest.rc && make -C /vagrant EMACS=$(EMACS) clean init test"
+
+.PHONY: virtual-clean
+virtual-clean:
+	@$(VAGRANT) destroy
 
 .PHONY: clean
 clean :
-	@$(CASK) clean-elc
-	rm -fr dist
+	@echo -e "$(OK_COLOR)[$(APP)] Cleanup$(NO_COLOR)"
+	@rm -fr $(OBJECTS) elpa $(APP)-pkg.el $(APP)-pkg.elc $(ARCHIVE).gz
 
 reset : clean
-	@rm -rf .cask # Clean packages installed for development
-	@rm -fr test/sandbox
+	@rm -rf .cask
+
+pkg-file:
+	$(CASK) pkg-file
+
+pkg-el: pkg-file
+	$(CASK) package
+
+package: clean pkg-el
+	@echo -e "$(OK_COLOR)[$(APP)] Packaging$(NO_COLOR)"
+	cp dist/$(ARCHIVE) .
+	gzip $(ARCHIVE)
+	rm -fr dist
 
 %.elc : %.el
 	@$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
-	$(EMACSFLAGS) \
-	-f batch-byte-compile $<
+		$(EMACSFLAGS) \
+		-f batch-byte-compile $<

@@ -2,12 +2,12 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.2.0
-;; Keywords: go, tests
+;; Version: 0.3.0
+;; Keywords: languages, go, tests
 
-;; Package-Requires: ((s "1.9.0") (f "0.11.0") (go-mode "20131222"))
+;; Package-Requires: ((s "1.9.0") (f "0.17.2") (go-mode "1.0.0"))
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -133,7 +133,10 @@ For example, if the current buffer is `foo.go', the buffer for
   (if (string-match "_test\.go$" buffer-file-name)
       (current-buffer)
     (let ((ff-always-try-to-create nil))
-      (find-file-noselect (ff-other-file-name)))))
+      (let ((filename (ff-other-file-name)))
+        (message "File :%s" filename)
+        (find-file-noselect filename)))))
+;      (find-file-noselect (ff-other-file-name)))))
 
 
 (defun go-test-get-current-test ()
@@ -160,16 +163,19 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-get-current-file-tests ()
   "Generate regexp to match tests in the current buffer."
   (with-current-buffer (go-test-get-current-buffer)
-   (save-excursion
-     (goto-char (point-min))
-     (if (string-match "\.go$" buffer-file-name)
-     (let (tests)
-       (while (or
-               (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
-               (re-search-forward "^[[:space:]]*func[[:space:]]*\\(Example[^(]+\\)" nil t))
-         (let ((test (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
-           (setq tests (append tests (list test)))))
-       (mapconcat 'identity tests "|"))))))
+    (save-excursion
+      (goto-char (point-min))
+      (if (string-match "\.go$" buffer-file-name)
+          (let (tests)
+            (while (or
+                    (re-search-forward
+                     "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
+                    (re-search-forward
+                     "^[[:space:]]*func[[:space:]]*\\(Example[^(]+\\)" nil t))
+              (let ((test (buffer-substring-no-properties
+                           (match-beginning 1) (match-end 1))))
+                (setq tests (append tests (list test)))))
+            (mapconcat 'identity tests "|"))))))
 
 
 (defun go-test-arguments (args)

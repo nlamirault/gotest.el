@@ -75,25 +75,43 @@ You can create some key bindings with these commands:
 
 ### Cask
 
-``gotest.el`` use [Cask][] for dependencies
-management. Install it and retrieve dependencies :
+``gotest.el`` use [Cask][] for dependencies management. Install it and
+retrieve dependencies :
 
     $ curl -fsSkL https://raw.github.com/cask/cask/master/go | python
     $ export PATH="$HOME/.cask/bin:$PATH"
     $ cask
 
 
-### Tests
+### Testing
 
-Launch unit tests :
+* Launch unit tests from shell
 
     $ make clean test
+
+* Using [overseer][] :
+
+Keybinding           | Description
+---------------------|------------------------------------------------------------
+<kbd>C-c , t</kbd>   | launch unit tests from buffer
+<kbd>C-c , b</kbd>   | launch unit tests
+<kbd>C-c , g</kbd>   | launch unit tests with tag (find, regexp, ...)
+
+* Tips:
+
+If you want to launch a single unit test, add a specify tag :
+
+```lisp
+(ert-deftest test-foobar ()
+  :tags '(current)
+  ```
+
+And launch it using : <kbd>C-c , g</kbd> and specify tag : *current*
 
 
 ## Support / Contribute
 
 See [here](CONTRIBUTING.md)
-
 
 
 ## Changelog
@@ -121,3 +139,5 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [MELPA]: http://melpa.milkbox.net/
 [Cask]: http://cask.github.io/
 [Issue tracker]: https://github.com/nlamirault/gotest.el/issues
+
+[overseer]: https://github.com/tonini/overseer.el
