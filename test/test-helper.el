@@ -1,6 +1,6 @@
 ;; test-helper.el --- Test helpers for gotest.el
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@chmouel.com>
 ;; Homepage: https://github.com/nlamirault/gotest.el
@@ -27,6 +27,8 @@
 ;;; Code:
 
 (require 'ansi)
+(require 'cl) ;; http://emacs.stackexchange.com/questions/2864/symbols-function-definition-is-void-cl-macroexpand-all-when-trying-to-instal
+(require 'ert)
 (require 'f)
 (require 'undercover)
 
@@ -72,16 +74,20 @@
     (require 'gotest path)))
 
 
-;;(message "Running tests on Emacs %s" emacs-version)
-
-;; (message "Load gotest : %s" go-test-source-dir)
-;; (load (s-concat go-test-source-dir "/gotest.elc"))
-
-
-;; (defadvice undercover--report-on-kill (around self-report activate)
-;;   (let ((undercover--files (list (file-truename "gotest.el"))))
-;;     ad-do-it))
-
+(defmacro with-test-sandbox (&rest body)
+  "Evaluate BODY in an empty sandbox directory."
+  `(unwind-protect
+       (condition-case nil ;ex
+           (let ((default-directory go-test-source-dir))
+             ;; (unless (f-dir? go-test-sandbox-path)
+             ;;   (f-mkdir go-test-sandbox-path))
+             (cleanup-load-path)
+             (load-library "/gotest.el")
+             ,@body)
+         ;; (f-delete go-test-sandbox-path :force)))
+         )))
+         ;; (error
+         ;;  (message (ansi-red "[gotest] Error during unit tests : %s" ex))))))
 
 (provide 'test-helper)
 ;;; test-helper.el ends here

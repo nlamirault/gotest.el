@@ -134,7 +134,7 @@ before_script:
 ###
 
 script:
-  echo "Method is $METHOD " && $EMACS --version && EMACS="$EMACS" make integration-test
+  echo "Method is $METHOD " && $EMACS --version && EMACS="$EMACS" make test
 
 ###
 ### settings
