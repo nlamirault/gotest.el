@@ -242,6 +242,15 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (go-test-run "./..."))
 
+;;;###autoload
+(defun go-test-coverage ()
+  "Launch go test on the current project."
+  (interactive)
+  (let ((args (s-concat
+               "--coverprofile="
+               (expand-file-name (read-file-name "Coverage file" nil "cover.out")) " ./...")))
+    (go-test-run args)))
+
 
 ;;;###autoload
 (defun go-run ()
