@@ -242,7 +242,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((args (s-concat
                "--coverprofile="
-               (expand-file-name (go--coverage-file)) " ./...")))
+               (expand-file-name (read-file-name "Coverage file" nil "cover.out")) " ./...")))
     (go-test-run args)))
 
 
