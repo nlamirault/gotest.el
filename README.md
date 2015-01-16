@@ -46,6 +46,10 @@ Launch unit tests for the current file.
 
 Launch unit tests for the current project.
 
+### go-test-current-coverage
+
+Launch unit tests coverage for the current project.
+
 ### go-run
 
 Launch program via `go run`.  Optionally configure the buffer-local
