@@ -209,8 +209,8 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-run-arguments ()
   "Arguments for go run."
   (let ((opts (if go-run-args
-                  (s-concat buffer-file-name " " go-run-args)
-                buffer-file-name)))
+                  (s-concat (shell-quote-argument (buffer-file-name)) " " go-run-args)
+                (shell-quote-argument (buffer-file-name)))))
     (go-test-get-arguments opts 'go-run-history)))
 
 
