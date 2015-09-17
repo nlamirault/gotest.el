@@ -10,8 +10,10 @@ dependencies:
     - chmod +x ~/.evm/bin/evm
     - ~/.evm/bin/evm install emacs-24.4-bin
     - ~/.evm/bin/evm install emacs-24.5-bin
-    - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 test:
   override:
-    - ~/.evm/bin/evm use emacs-24.4-bin && PATH="${HOME}/.cask/bin:$PATH" make test
-    - ~/.evm/bin/evm use emacs-24.5-bin && PATH="${HOME}/.cask/bin:$PATH" make test
+    - ~/.evm/bin/evm use emacs-24.4-bin
+    - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+    - PATH="${HOME}/.cask/bin:$PATH" make test
+    - ~/.evm/bin/evm use emacs-24.5-bin
+    - PATH="${HOME}/.cask/bin:$PATH" make test
