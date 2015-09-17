@@ -1,0 +1,13 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - sudo echo "deb http://emacs.secretsauce.net unstable main" >> /etc/apt/sources.list
+    - wget -q -O - http://emacs.secretsauce.net/key.gpg | sudo apt-key add -
+    - sudo apt-get update; sudo apt-get install emacs-snapshot
+    - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+test:
+  override:
+    - PATH="${HOME}/.cask/bin:$PATH" make test
