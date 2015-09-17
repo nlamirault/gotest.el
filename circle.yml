@@ -5,6 +5,7 @@ machine:
 dependencies:
   pre:
     - sudo mkdir /usr/local/evm
+    - sudo chown $USER: /usr/local/evm
     - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
     - chmod +x ~/.evm/bin/evm
     - ~/.evm/bin/evm install emacs-24.4-bin
