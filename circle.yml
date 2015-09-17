@@ -4,10 +4,12 @@ machine:
 
 dependencies:
   pre:
-    - sudo bash -c "echo 'deb http://emacs.secretsauce.net unstable main' >> /etc/apt/sources.list"
-    - wget -q -O - http://emacs.secretsauce.net/key.gpg | sudo apt-key add -
-    - sudo apt-get update; sudo apt-get install emacs-snapshot
+    - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
+    - chmod +x ~/.evm/bin/evm
+    - ~/.evm/bin/evm install emacs-24.4-bin
+    - ~/.evm/bin/evm install emacs-24.5-bin
     - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 test:
   override:
-    - PATH="${HOME}/.cask/bin:$PATH" make test
+    - ~/.evm/bin/evm use emacs-24.4-bin && PATH="${HOME}/.cask/bin:$PATH" make test
+    - ~/.evm/bin/evm use emacs-24.5-bin && PATH="${HOME}/.cask/bin:$PATH" make test
