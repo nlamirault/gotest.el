@@ -2,8 +2,8 @@
 
 [![License GPL 3][badge-license]][LICENSE]
 [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el)
-[![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
-[![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
+[![Melpa Status](https://melpa.org/packages/gotest-badge.svg)](https://melpa.org/#/gotest)
+[![MELPA Stable](https://stable.melpa.org/packages/gotest-badge.svg)](https://stable.melpa.org/#/gotest)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
 
 Run [Go](http://golang.org) tests and programs from Emacs (>= 24.3)
@@ -136,7 +136,7 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [LICENSE]: https://github.com/nlamirault/gotest.el/blob/master/LICENSE
 
 [GNU Emacs]: https://www.gnu.org/software/emacs/
-[MELPA]: http://melpa.milkbox.net/
+[MELPA]: https://melpa.org/
 [Cask]: http://cask.github.io/
 [Issue tracker]: https://github.com/nlamirault/gotest.el/issues
 
