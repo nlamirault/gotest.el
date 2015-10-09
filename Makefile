@@ -48,7 +48,6 @@ help:
 
 init:
 	@echo -e "$(OK_COLOR)[$(APP)] Initialize environment$(NO_COLOR)"
-        @echo -e "Emacs version : $(EMACS) --version"
 	@$(CASK) --dev install
 
 elpa:
