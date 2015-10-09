@@ -2,10 +2,10 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.3.0
+;; Version: 0.5.0
 ;; Keywords: languages, go, tests
 
-;; Package-Requires: ((s "1.9.0") (f "0.17.2") (go-mode "1.0.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17.2") (go-mode "1.0.0"))
 
 ;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -209,8 +209,8 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-run-arguments ()
   "Arguments for go run."
   (let ((opts (if go-run-args
-                  (s-concat buffer-file-name " " go-run-args)
-                buffer-file-name)))
+                  (s-concat (shell-quote-argument (buffer-file-name)) " " go-run-args)
+                (shell-quote-argument (buffer-file-name)))))
     (go-test-get-arguments opts 'go-run-history)))
 
 

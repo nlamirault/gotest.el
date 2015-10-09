@@ -1,5 +1,10 @@
 # gotest.el ChangeLog
 
+# Version 0.4.0 (09/17/2015)
+
+- Migrate to CircleCI for continuous integration
+- #14: escape file path in go command (thanks ntcong)
+
 # Version 0.3.0 (01/15/2015)
 
 - Support test coverage ([P11][])

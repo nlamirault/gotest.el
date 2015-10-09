@@ -1,6 +1,12 @@
 # gotest.el
 
 [![License GPL 3][badge-license]][LICENSE]
+<<<<<<< HEAD
+=======
+[![Circle CI](https://circleci.com/gh/nlamirault/gotest.el.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el)
+[![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
+[![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
+>>>>>>> c0bcdc202f0149f8c06245eec84fd6445c1eb0fe
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
 
 Master :
@@ -139,10 +145,7 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [gotest]: https://github.com/nlamirault/gotest.el
 [badge-license]: https://img.shields.io/badge/license-GPL_2-green.svg?style=flat
 [LICENSE]: https://github.com/nlamirault/gotest.el/blob/master/LICENSE
-[travis]: https://travis-ci.org/nlamirault/gotest.el
-[badge-travis]: http://img.shields.io/travis/nlamirault/gotest.el.svg?style=flat
-[badge-drone]: https://drone.io/github.com/nlamirault/gotest.el/status.png
-[drone]: https://drone.io/github.com/nlamirault/gotest.el/latest
+
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [MELPA]: http://melpa.milkbox.net/
 [Cask]: http://cask.github.io/
