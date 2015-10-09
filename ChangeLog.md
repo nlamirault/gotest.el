@@ -1,5 +1,9 @@
 # gotest.el ChangeLog
 
+# Version 0.5.0 (10/09/2015)
+
+- #PR15: Specify minimum Emacs version
+
 # Version 0.4.0 (09/17/2015)
 
 - Migrate to CircleCI for continuous integration
