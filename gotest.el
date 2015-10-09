@@ -2,7 +2,7 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.5.0
+;; Version: 0.6.0
 ;; Keywords: languages, go, tests
 
 ;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17.2") (go-mode "1.0.0"))
