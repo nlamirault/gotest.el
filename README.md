@@ -1,11 +1,15 @@
 # gotest.el
 
 [![License GPL 3][badge-license]][LICENSE]
-[![travis][badge-travis]][travis]
-[![drone][badge-drone]][drone]
-[![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
-[![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
+
+Master :
+* [![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
+* [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/master.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/master)
+
+Develop:
+* [![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
+* [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/develop.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/develop)
 
 Run [Go](http://golang.org) tests and programs from Emacs (>= 24.3)
 
