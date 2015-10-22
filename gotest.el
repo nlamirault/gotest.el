@@ -84,8 +84,7 @@ Only file names ending in `.go' will be matched by default.
 Instead of an alist element, you can use a symbol, which is
 looked up in `go-testcompilation-error-regexp-alist-alist'.
 
-See also: `compilation-error-regexp-alist'.
-"
+See also: `compilation-error-regexp-alist'."
   :type '(repeat (choice (symbol :tag "Predefined symbol")
 			 (sexp :tag "Error specification")))
   :group 'gotest)
@@ -140,6 +139,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-get-current-test ()
+  "Return the current test name."
   (let ((start (point))
         test-prefix
         test-name)
@@ -161,7 +161,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-get-current-file-tests ()
-  "Generate regexp to match tests in the current buffer."
+  "Generate regexp to match test in the current buffer."
   (with-current-buffer (go-test-get-current-buffer)
     (save-excursion
       (goto-char (point-min))
@@ -179,6 +179,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-arguments (args)
+  "Make the go test command argurments using `ARGS'."
   (let ((opts args))
     (when go-test-verbose
       (setq opts (s-concat opts " -v")))
@@ -188,6 +189,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-compilation-hook (p)
+  "Add compilation hooks."
   (set (make-local-variable 'compilation-error-regexp-alist-alist)
        go-test-compilation-error-regexp-alist-alist)
   (set (make-local-variable 'compilation-error-regexp-alist)
