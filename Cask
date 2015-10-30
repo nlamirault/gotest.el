@@ -1,6 +1,6 @@
 ;;; Scame Cask file
 
-(source "melpa" "http://melpa.org/packages/")
+(source "melpa" "http://stable.melpa.org/packages/")
 (source "gnu" "http://elpa.gnu.org/packages/")
 
 (package-file "gotest.el")
