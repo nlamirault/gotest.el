@@ -148,68 +148,72 @@ For example, if the current buffer is `foo.go', the buffer for
       (let ((filename (ff-other-file-name)))
         (message "File :%s" filename)
         (find-file-noselect filename)))))
-;      (find-file-noselect (ff-other-file-name)))))
+
+
+(defun go-test--get-current-data (prefix)
+  "Return the current data: test, example or benchmark.
+`PREFIX' defines token to place cursor."
+  (let ((start (point))
+        name)
+    (save-excursion
+      (end-of-line)
+      (unless (and
+               (search-backward-regexp
+                (s-concat "^[[:space:]]*func[[:space:]]*" prefix) nil t)
+               (save-excursion (go-end-of-defun) (< start (point))))
+        (error "Unable to find data"))
+      (save-excursion
+        (search-forward prefix)
+        (setq name (thing-at-point 'word))))
+    name))
 
 
 (defun go-test-get-current-test ()
   "Return the current test name."
-  (let ((start (point))
-        test-prefix
-        test-name)
-    (save-excursion
-      (end-of-line)
-      (setq test-prefix "Test")
-      (unless (and
-               (or
-                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test"
-                                        nil t)
-                (and
-                 (setq test-prefix "Example")
-                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example"
-                                         nil t)))
-               (save-excursion (go-end-of-defun) (< start (point))))
-        (error "Unable to find a test"))
-      (save-excursion
-        (search-forward test-prefix)
-        (setq test-name (thing-at-point 'word))))
-    test-name))
-
-
-(defun go-test-get-current-file-tests ()
-  "Generate regexp to match test in the current buffer."
-  (with-current-buffer (go-test-get-current-buffer)
-    (save-excursion
-      (goto-char (point-min))
-      (if (string-match "\.go$" buffer-file-name)
-          (let (tests)
-            (while (or
-                    (re-search-forward
-                     "^[[:space:]]*func[[:space:]]*\\(Test[^(]+\\)" nil t)
-                    (re-search-forward
-                     "^[[:space:]]*func[[:space:]]*\\(Example[^(]+\\)" nil t))
-              (let ((test (buffer-substring-no-properties
-                           (match-beginning 1) (match-end 1))))
-                (setq tests (append tests (list test)))))
-            (mapconcat 'identity tests "|"))))))
+  (go-test--get-current-data "Test"))
 
 
 (defun go-test-get-current-benchmark ()
   "Return the current benchmark name."
-  (let ((start (point))
-        benchmark-prefix
-        benchmark-name)
+  (go-test--get-current-data "Benchmark"))
+
+
+(defun go-test-get-current-example ()
+  "Return the current example name."
+  (go-test--get-current-data "Example"))
+
+
+(defun go-test--get-current-file-data (prefix)
+  "Generate regexp to match test, benchmark or example the current buffer."
+  (with-current-buffer (go-test-get-current-buffer)
     (save-excursion
-      (end-of-line)
-      (setq benchmark-prefix "Benchmark")
-      (unless (and
-               (search-backward-regexp "^[[:space:]]*func[[:space:]]*Benchmark"
-                                       nil t)
-               (save-excursion (go-end-of-defun) (< start (point))))
-        (error "Unable to find a benchmark"))
-      (save-excursion
-        (search-forward benchmark-prefix)
-        (setq benchmark-name (thing-at-point 'word))))
-    benchmark-name))
+      (goto-char (point-min))
+      (if (string-match "\.go$" buffer-file-name)
+          (let ((regex
+                 (s-concat "^[[:space:]]*func[[:space:]]*\\(" prefix "[^(]+\\)"))
+                result)
+            (while
+                (re-search-forward regex nil t)
+              (let ((data (buffer-substring-no-properties
+                           (match-beginning 1) (match-end 1))))
+                (setq result (append result (list data)))))
+            (mapconcat 'identity result "|"))))))
+
+
+(defun go-test-get-current-file-tests ()
+  "Generate regexp to match test in the current buffer."
+  (go-test--get-current-file-data "Test"))
+
+
+(defun go-test-get-current-file-benchmarks ()
+  "Generate regexp to match benchmark in the current buffer."
+  (go-test--get-current-file-data "Benchmark"))
+
+
+(defun go-test-get-current-file-examples ()
+  "Generate regexp to match example in the current buffer."
+  (go-test--get-current-file-data "Example"))
+
 
 (defun go-test-arguments (args)
   "Make the go test command argurments using `ARGS'."
@@ -257,10 +261,21 @@ For example, if the current buffer is `foo.go', the buffer for
   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
 
+(defun is-gb-project ()
+  "Check if project use GB or not."
+  (let* ((root-dir (go-test-get-root-directory))
+         (vendor-dir (s-concat root-dir "vendor"))
+         (manifest (s-concat vendor-dir "/manifest")))
+    (and (f-dir? vendor-dir)
+         (f-exists? manifest))))
+
 
 ; API
 ;; ----
 
+
+;; Unit tests
+;; ----------------------
 
 ;;;###autoload
 (defun go-test-current-test ()
@@ -268,41 +283,63 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((test-name (go-test-get-current-test)))
     (when test-name
-      (let* ((root-dir (go-test-get-root-directory))
-             (vendor-dir (s-concat root-dir "vendor"))
-             (manifest (s-concat vendor-dir "/manifest")))
-        (if (and (f-dir? vendor-dir)
-                 (f-exists? manifest))
-            (gb-test-run (s-concat "-test.v=true -test.run=" test-name "$"))
-          (go-test-run (s-concat "-run " test-name "$")))))))
+      (if (is-gb-project)
+          (gb-test-run (s-concat "-test.v=true -test.run=" test-name "$"))
+        (go-test-run (s-concat "-run " test-name "$"))))))
 
 
 ;;;###autoload
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let ((tests (go-test-get-current-file-tests)))
-    (let* ((root-dir (go-test-get-root-directory))
-           (vendor-dir (s-concat root-dir "vendor"))
-           (manifest (s-concat vendor-dir "/manifest")))
-      (if (and (f-dir? vendor-dir)
-               (f-exists? manifest))
-          (gb-test-run (s-concat "-test.v=true -test.run='" tests "'"))
-        (go-test-run (s-concat "-run='" tests "'"))))))
+  (let* ((tests (go-test-get-current-file-tests))
+         (examples (go-test-get-current-file-examples))
+         (data (s-concat tests "|" examples)))
+    (if (is-gb-project)
+        (gb-test-run (s-concat "-test.v=true -test.run='" data "'"))
+      (go-test-run (s-concat "-run='" data "'")))))
 
 
 ;;;###autoload
 (defun go-test-current-project ()
   "Launch go test on the current project."
   (interactive)
-  (let* ((root-dir (go-test-get-root-directory))
-         (vendor-dir (s-concat root-dir "vendor"))
-         (manifest (s-concat vendor-dir "/manifest")))
-    (message "=> %s %s %s" root-dir vendor-dir manifest)
-    (if (and (f-dir? vendor-dir)
-             (f-exists? manifest))
-        (gb-test-run "all -test.v=true")
-      (go-test-run "./..."))))
+  (if (is-gb-project)
+      (gb-test-run "all -test.v=true")
+    (go-test-run "./...")))
+
+
+
+;; Benchmarks
+;; ----------------------
+
+
+;;;###autoload
+(defun go-test-current-benchmark ()
+  "Launch go benchmark on current benchmark."
+  (interactive)
+  (let ((benchmark-name (go-test-get-current-benchmark)))
+    (when benchmark-name
+      (go-test-run (s-concat "-run ^NOTHING -bench " benchmark-name "$")))))
+
+
+;;;###autoload
+(defun go-test-current-file-benchmarks ()
+  "Launch go benchmark on current file benchmarks."
+  (interactive)
+  (let ((benchmarks (go-test-get-current-file-benchmarks)))
+    (go-test-run (s-concat "-run ^NOTHING -bench '" benchmarks "'"))))
+
+
+;;;###autoload
+(defun go-test-current-project-benchmarks ()
+  "Launch go benchmark on current project."
+  (interactive)
+  (go-test-run (s-concat "-run ^NOTHING -bench .")))
+
+
+;; Coverage
+;; -------------
 
 
 ;;;###autoload
@@ -324,15 +361,6 @@ For example, if the current buffer is `foo.go', the buffer for
   (compile (go-run-get-program (go-run-arguments)))
   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
-
-;;;###autoload
-(defun go-test-current-benchmark ()
-  "Launch go benchmark on current benchmark."
-  (interactive)
-  (let ((benchmark-name (go-test-get-current-benchmark)))
-    (when benchmark-name
-      (let ((args (s-concat "-run ^NOTHING -bench " benchmark-name "$")))
-      (go-test-run args)))))
 
 
 

@@ -44,11 +44,11 @@ Launch unit tests for the current test.
 
 ### go-test-current-file
 
-Launch unit tests for the current file.
+Launch unit tests and examples for the current file
 
 ### go-test-current-project
 
-Launch unit tests for the current project.
+Launch unit tests and examples for the current project.
 
 ### go-test-current-coverage
 
@@ -57,6 +57,14 @@ Launch unit tests coverage for the current project.
 ### go-test-current-benchmark
 
 Launch go benchmark on current benchmark
+
+### go-test-current-file-benchmarks
+
+Launch go benchmark on current file
+
+### go-test-current-project-benchmarks
+
+Launch go benchmark on current project
 
 ### go-run
 
@@ -71,6 +79,7 @@ prefix can be used in combination with your `go run` key binding to
 use the most recent arguments without prompting.  The go file is
 included in history, so you can `go-run` from history regardless of
 which buffer you are currently visiting.
+
 
 ## Example key bindings
 

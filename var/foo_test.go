@@ -9,17 +9,37 @@ func TestA(t *testing.T) {
 	fmt.Println("test a")
 }
 
+func TestB(t *testing.T) {
+	fmt.Println("test b")
+}
+
 func TestAB(t *testing.T) {
 	fmt.Println("test ab")
 }
 
 func ExampleA() {
-	fmt.Println("Example")
-	// Output: Example
+	fmt.Println("Example A")
+	// Output: Example A
+}
+
+func ExampleB() {
+	fmt.Println("Example B")
+	// Output: Example B
+}
+
+func ExampleC() {
+	fmt.Println("Example C")
+	// Output: Example C
 }
 
 func BenchmarkHello(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fmt.Sprintf("hello")
+		fmt.Println("hello")
+	}
+}
+
+func BenchmarkHelloWorld(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		fmt.Println("hello world")
 	}
 }
