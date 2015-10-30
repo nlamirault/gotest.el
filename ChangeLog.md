@@ -1,5 +1,12 @@
 # gotest.el ChangeLog
 
+# Version 0.6.0 (IN PROGRESS)
+
+- Init support for [gb][]
+- #20: Add support for running benchmark
+- `FIX` #19: Regex for single unit test
+- Update documentation
+
 # Version 0.5.0 (10/09/2015)
 
 - #PR15: Specify minimum Emacs version
@@ -29,4 +36,4 @@
 [ert-runner]: https://github.com/rejeep/ert-runner.el
 [overseer]: https://github.com/tonini/overseer.el
 
-[P11]: https://github.com/nlamirault/gotest.el/pull/11
+[gb]: http://getgb.io/

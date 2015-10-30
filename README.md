@@ -4,11 +4,11 @@
 [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
 
 Master :
-* [![MELPA Stable](http://stable.melpa.org/packages/gotest-badge.svg)](http://stable.melpa.org/#/gotest)
+* [![MELPA Stable](https://stable.melpa.org/packages/gotest-badge.svg)](https://stable.melpa.org/#/gotest)
 * [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/master.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/master)
 
 Develop:
-* [![Melpa Status](http://melpa.milkbox.net/packages/gotest-badge.svg)](http://melpa.milkbox.net/#/gotest)
+* [![Melpa Status](https://melpa.org/packages/gotest-badge.svg)](https://melpa.org/#/gotest)
 * [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/develop.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/develop)
 
 Run [Go](http://golang.org) tests and programs from Emacs (>= 24.3)
@@ -54,6 +54,10 @@ Launch unit tests for the current project.
 
 Launch unit tests coverage for the current project.
 
+### go-test-current-benchmark
+
+Launch go benchmark on current benchmark
+
 ### go-run
 
 Launch program via `go run`.  Optionally configure the buffer-local
@@ -75,9 +79,17 @@ You can create some key bindings with these commands:
 ```lisp
 (define-key go-mode-map (kbd "C-x f") 'go-test-current-file)
 (define-key go-mode-map (kbd "C-x t") 'go-test-current-test)
-(define-key go-mode-map (kbd "C-x p") 'go-test-current-project)
+(define-key go-mode-map (kbd "C-x p") 'go-test-current-project
+(define-key go-mode-map (kbd "C-x b") 'go-test-current-benchmark)
 (define-key go-mode-map (kbd "C-x x") 'go-run)
 ```
+
+## Addons
+
+### Gb
+
+If your project use [gb][], *gotest* will use this tool to launch unit tests.
+
 
 ## Development
 
@@ -146,3 +158,5 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [Issue tracker]: https://github.com/nlamirault/gotest.el/issues
 
 [overseer]: https://github.com/tonini/overseer.el
+
+[gb]: http://getgb.io/

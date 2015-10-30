@@ -2,10 +2,10 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.5.0
+;; Version: 0.6.0
 ;; Keywords: languages, go, tests
 
-;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17.2") (go-mode "1.0.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.10.0") (f "0.18.0") (go-mode "1.3.1"))
 
 ;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -58,6 +58,14 @@
   :type 'boolean
   :group 'gotest)
 
+(defcustom gb-command "gb"
+  "The 'gb' command.
+A project based build tool for the Go programming language.
+See https://getgb.io."
+  :type 'string
+  :group 'gotest)
+
+
 (defvar go-test-compilation-error-regexp-alist-alist
   '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
     (go-test-testify . ("^\tLocation:\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\)$" 1 2)) ;; testify package assert
@@ -84,8 +92,7 @@ Only file names ending in `.go' will be matched by default.
 Instead of an alist element, you can use a symbol, which is
 looked up in `go-testcompilation-error-regexp-alist-alist'.
 
-See also: `compilation-error-regexp-alist'.
-"
+See also: `compilation-error-regexp-alist'."
   :type '(repeat (choice (symbol :tag "Predefined symbol")
 			 (sexp :tag "Error specification")))
   :group 'gotest)
@@ -94,12 +101,11 @@ See also: `compilation-error-regexp-alist'.
 ;; Commands
 ;; -----------
 
+
 (defun go-test-get-program (args)
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-command " test "
-            ;;(go-test-get-root-directory)
-            args))
+  (s-concat go-command " test " args))
 
 
 (defun go-test-get-arguments (defaults history)
@@ -114,6 +120,12 @@ When any other prefix argument is given, prompt for arguments using HISTORY."
                (prompt (s-concat "go " name " args: ")))
           (read-shell-command prompt defaults history)))
     defaults))
+
+
+(defun gb-test-get-program (args)
+  "Return the command to launch unit test using GB..
+`ARGS' corresponds to go command line arguments."
+  (s-concat gb-command " test " args))
 
 
 (defun go-test-get-root-directory()
@@ -140,6 +152,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-get-current-test ()
+  "Return the current test name."
   (let ((start (point))
         test-prefix
         test-name)
@@ -148,10 +161,12 @@ For example, if the current buffer is `foo.go', the buffer for
       (setq test-prefix "Test")
       (unless (and
                (or
-                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test" nil t)
+                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test"
+                                        nil t)
                 (and
                  (setq test-prefix "Example")
-                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example" nil t)))
+                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example"
+                                         nil t)))
                (save-excursion (go-end-of-defun) (< start (point))))
         (error "Unable to find a test"))
       (save-excursion
@@ -161,7 +176,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-get-current-file-tests ()
-  "Generate regexp to match tests in the current buffer."
+  "Generate regexp to match test in the current buffer."
   (with-current-buffer (go-test-get-current-buffer)
     (save-excursion
       (goto-char (point-min))
@@ -178,7 +193,26 @@ For example, if the current buffer is `foo.go', the buffer for
             (mapconcat 'identity tests "|"))))))
 
 
+(defun go-test-get-current-benchmark ()
+  "Return the current benchmark name."
+  (let ((start (point))
+        benchmark-prefix
+        benchmark-name)
+    (save-excursion
+      (end-of-line)
+      (setq benchmark-prefix "Benchmark")
+      (unless (and
+               (search-backward-regexp "^[[:space:]]*func[[:space:]]*Benchmark"
+                                       nil t)
+               (save-excursion (go-end-of-defun) (< start (point))))
+        (error "Unable to find a benchmark"))
+      (save-excursion
+        (search-forward benchmark-prefix)
+        (setq benchmark-name (thing-at-point 'word))))
+    benchmark-name))
+
 (defun go-test-arguments (args)
+  "Make the go test command argurments using `ARGS'."
   (let ((opts args))
     (when go-test-verbose
       (setq opts (s-concat opts " -v")))
@@ -188,6 +222,7 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test-compilation-hook (p)
+  "Add compilation hooks."
   (set (make-local-variable 'compilation-error-regexp-alist-alist)
        go-test-compilation-error-regexp-alist-alist)
   (set (make-local-variable 'compilation-error-regexp-alist)
@@ -214,6 +249,15 @@ For example, if the current buffer is `foo.go', the buffer for
     (go-test-get-arguments opts 'go-run-history)))
 
 
+(defun gb-test-run (args)
+  "Test using GB.
+`ARGS' corresponds to command line arguments."
+  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  (compile (gb-test-get-program args))
+  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+
+
+
 ; API
 ;; ----
 
@@ -224,23 +268,41 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((test-name (go-test-get-current-test)))
     (when test-name
-      (let ((args (s-concat "-run " test-name)))
-      (go-test-run args)))))
+      (let* ((root-dir (go-test-get-root-directory))
+             (vendor-dir (s-concat root-dir "vendor"))
+             (manifest (s-concat vendor-dir "/manifest")))
+        (if (and (f-dir? vendor-dir)
+                 (f-exists? manifest))
+            (gb-test-run (s-concat "-test.v=true -test.run=" test-name "$"))
+          (go-test-run (s-concat "-run " test-name "$")))))))
 
 
 ;;;###autoload
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let ((args (s-concat "-run='" (go-test-get-current-file-tests) "'")))
-    (go-test-run args)))
+  (let ((tests (go-test-get-current-file-tests)))
+    (let* ((root-dir (go-test-get-root-directory))
+           (vendor-dir (s-concat root-dir "vendor"))
+           (manifest (s-concat vendor-dir "/manifest")))
+      (if (and (f-dir? vendor-dir)
+               (f-exists? manifest))
+          (gb-test-run (s-concat "-test.v=true -test.run='" tests "'"))
+        (go-test-run (s-concat "-run='" tests "'"))))))
 
 
 ;;;###autoload
 (defun go-test-current-project ()
   "Launch go test on the current project."
   (interactive)
-  (go-test-run "./..."))
+  (let* ((root-dir (go-test-get-root-directory))
+         (vendor-dir (s-concat root-dir "vendor"))
+         (manifest (s-concat vendor-dir "/manifest")))
+    (message "=> %s %s %s" root-dir vendor-dir manifest)
+    (if (and (f-dir? vendor-dir)
+             (f-exists? manifest))
+        (gb-test-run "all -test.v=true")
+      (go-test-run "./..."))))
 
 
 ;;;###autoload
@@ -249,7 +311,8 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((args (s-concat
                "--coverprofile="
-               (expand-file-name (read-file-name "Coverage file" nil "cover.out")) " ./...")))
+               (expand-file-name
+                (read-file-name "Coverage file" nil "cover.out")) " ./...")))
     (go-test-run args)))
 
 
@@ -260,6 +323,18 @@ For example, if the current buffer is `foo.go', the buffer for
   (add-hook 'compilation-start-hook 'go-test-compilation-hook)
   (compile (go-run-get-program (go-run-arguments)))
   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+
+
+;;;###autoload
+(defun go-test-current-benchmark ()
+  "Launch go benchmark on current benchmark."
+  (interactive)
+  (let ((benchmark-name (go-test-get-current-benchmark)))
+    (when benchmark-name
+      (let ((args (s-concat "-run ^NOTHING -bench " benchmark-name "$")))
+      (go-test-run args)))))
+
+
 
 (provide 'gotest)
 ;;; gotest.el ends here

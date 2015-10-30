@@ -1,3 +1,8 @@
+# Emacs
+*~
 .cask/
 *.elc
 elpa
+
+# Golang
+var/var.test
