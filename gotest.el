@@ -58,6 +58,14 @@
   :type 'boolean
   :group 'gotest)
 
+(defcustom gb-command "gb"
+  "The 'gb' command.
+A project based build tool for the Go programming language.
+See https://getgb.io."
+  :type 'string
+  :group 'gotest)
+
+
 (defvar go-test-compilation-error-regexp-alist-alist
   '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
     (go-test-testify . ("^\tLocation:\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\)$" 1 2)) ;; testify package assert
@@ -93,12 +101,11 @@ See also: `compilation-error-regexp-alist'."
 ;; Commands
 ;; -----------
 
+
 (defun go-test-get-program (args)
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-command " test "
-            ;;(go-test-get-root-directory)
-            args))
+  (s-concat go-command " test " args))
 
 
 (defun go-test-get-arguments (defaults history)
@@ -113,6 +120,12 @@ When any other prefix argument is given, prompt for arguments using HISTORY."
                (prompt (s-concat "go " name " args: ")))
           (read-shell-command prompt defaults history)))
     defaults))
+
+
+(defun gb-test-get-program (args)
+  "Return the command to launch unit test using GB..
+`ARGS' corresponds to go command line arguments."
+  (s-concat gb-command " test " args))
 
 
 (defun go-test-get-root-directory()
@@ -236,6 +249,15 @@ For example, if the current buffer is `foo.go', the buffer for
     (go-test-get-arguments opts 'go-run-history)))
 
 
+(defun gb-test-run (args)
+  "Test using GB.
+`ARGS' corresponds to command line arguments."
+  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  (compile (gb-test-get-program args))
+  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+
+
+
 ; API
 ;; ----
 
@@ -246,23 +268,41 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((test-name (go-test-get-current-test)))
     (when test-name
-      (let ((args (s-concat "-run " test-name "$")))
-      (go-test-run args)))))
+      (let* ((root-dir (go-test-get-root-directory))
+             (vendor-dir (s-concat root-dir "vendor"))
+             (manifest (s-concat vendor-dir "/manifest")))
+        (if (and (f-dir? vendor-dir)
+                 (f-exists? manifest))
+            (gb-test-run (s-concat "-test.v=true -test.run=" test-name "$"))
+          (go-test-run (s-concat "-run " test-name "$")))))))
 
 
 ;;;###autoload
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let ((args (s-concat "-run='" (go-test-get-current-file-tests) "'")))
-    (go-test-run args)))
+  (let ((tests (go-test-get-current-file-tests)))
+    (let* ((root-dir (go-test-get-root-directory))
+           (vendor-dir (s-concat root-dir "vendor"))
+           (manifest (s-concat vendor-dir "/manifest")))
+      (if (and (f-dir? vendor-dir)
+               (f-exists? manifest))
+          (gb-test-run (s-concat "-test.v=true -test.run='" tests "'"))
+        (go-test-run (s-concat "-run='" tests "'"))))))
 
 
 ;;;###autoload
 (defun go-test-current-project ()
   "Launch go test on the current project."
   (interactive)
-  (go-test-run "./..."))
+  (let* ((root-dir (go-test-get-root-directory))
+         (vendor-dir (s-concat root-dir "vendor"))
+         (manifest (s-concat vendor-dir "/manifest")))
+    (message "=> %s %s %s" root-dir vendor-dir manifest)
+    (if (and (f-dir? vendor-dir)
+             (f-exists? manifest))
+        (gb-test-run "all -test.v=true")
+      (go-test-run "./..."))))
 
 
 ;;;###autoload
@@ -271,7 +311,8 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((args (s-concat
                "--coverprofile="
-               (expand-file-name (read-file-name "Coverage file" nil "cover.out")) " ./...")))
+               (expand-file-name
+                (read-file-name "Coverage file" nil "cover.out")) " ./...")))
     (go-test-run args)))
 
 
