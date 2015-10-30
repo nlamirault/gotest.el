@@ -180,6 +180,24 @@ For example, if the current buffer is `foo.go', the buffer for
             (mapconcat 'identity tests "|"))))))
 
 
+(defun go-test-get-current-benchmark ()
+  "Return the current benchmark name."
+  (let ((start (point))
+        benchmark-prefix
+        benchmark-name)
+    (save-excursion
+      (end-of-line)
+      (setq benchmark-prefix "Benchmark")
+      (unless (and
+               (search-backward-regexp "^[[:space:]]*func[[:space:]]*Benchmark"
+                                       nil t)
+               (save-excursion (go-end-of-defun) (< start (point))))
+        (error "Unable to find a benchmark"))
+      (save-excursion
+        (search-forward benchmark-prefix)
+        (setq benchmark-name (thing-at-point 'word))))
+    benchmark-name))
+
 (defun go-test-arguments (args)
   "Make the go test command argurments using `ARGS'."
   (let ((opts args))
@@ -264,6 +282,18 @@ For example, if the current buffer is `foo.go', the buffer for
   (add-hook 'compilation-start-hook 'go-test-compilation-hook)
   (compile (go-run-get-program (go-run-arguments)))
   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+
+
+;;;###autoload
+(defun go-test-current-benchmark ()
+  "Launch go benchmark on current benchmark."
+  (interactive)
+  (let ((benchmark-name (go-test-get-current-benchmark)))
+    (when benchmark-name
+      (let ((args (s-concat "-run ^NOTHING -bench " benchmark-name "$")))
+      (go-test-run args)))))
+
+
 
 (provide 'gotest)
 ;;; gotest.el ends here
