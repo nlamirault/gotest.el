@@ -1,6 +1,7 @@
 # gotest.el ChangeLog
 
-# Version 0.6.0 (IN PROGRESS)
+
+# Version 0.6.0 (10/30/2015)
 
 - Init support for [gb][]
 - #20: Add support for running benchmark
