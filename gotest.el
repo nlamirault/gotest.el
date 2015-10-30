@@ -148,10 +148,12 @@ For example, if the current buffer is `foo.go', the buffer for
       (setq test-prefix "Test")
       (unless (and
                (or
-                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test" nil t)
+                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test"
+                                        nil t)
                 (and
                  (setq test-prefix "Example")
-                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example" nil t)))
+                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example"
+                                         nil t)))
                (save-excursion (go-end-of-defun) (< start (point))))
         (error "Unable to find a test"))
       (save-excursion
@@ -226,7 +228,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((test-name (go-test-get-current-test)))
     (when test-name
-      (let ((args (s-concat "-run " test-name)))
+      (let ((args (s-concat "-run " test-name "$")))
       (go-test-run args)))))
 
 
