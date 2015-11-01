@@ -26,8 +26,6 @@
 
 ;;; Commentary:
 
-;; Thanks to tox.el(https://github.com/chmouel/tox.el) from Chmouel Boudjnah.
-
 ;;; Code:
 
 (require 'compile)
@@ -179,6 +177,7 @@ See https://getgb.io."
   (when (equal event "finished\n")
     (message "Go Test finished.")))
 
+
 ;; Commands
 ;; -----------
 
@@ -265,7 +264,8 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 (defun go-test--get-current-file-data (prefix)
-  "Generate regexp to match test, benchmark or example the current buffer."
+  "Generate regexp to match test, benchmark or example the current buffer.
+`PREFIX' defines token to place cursor."
   (with-current-buffer (go-test--get-current-buffer)
     (save-excursion
       (goto-char (point-min))
@@ -352,7 +352,7 @@ For example, if the current buffer is `foo.go', the buffer for
 ;;   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
 
-(defun is-gb-project ()
+(defun go-test--is-gb-project ()
   "Check if project use GB or not."
   (let* ((root-dir (go-test--get-root-directory))
          (vendor-dir (s-concat root-dir "vendor"))
@@ -393,7 +393,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((test-name (go-test--get-current-test)))
     (when test-name
-      (if (is-gb-project)
+      (if (go-test--is-gb-project)
           (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "$"))
         (go-test--go-test (s-concat "-run " test-name "$"))))))
 
@@ -405,7 +405,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (let* ((tests (go-test--get-current-file-tests))
          (examples (go-test--get-current-file-examples))
          (data (s-concat tests "|" examples)))
-    (if (is-gb-project)
+    (if (go-test--is-gb-project)
         (go-test--gb-start (s-concat "-test.v=true -test.run='" data "'"))
       (go-test--go-test (s-concat "-run='" data "'")))))
 
@@ -414,7 +414,7 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-project ()
   "Launch go test on the current project."
   (interactive)
-  (if (is-gb-project)
+  (if (go-test--is-gb-project)
       (go-test--gb-start "all -test.v=true")
     (go-test--go-test "./...")))
 
