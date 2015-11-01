@@ -15,6 +15,8 @@
 
 APP = gotest
 
+SHELL = /bin/bash
+
 EMACS ?= emacs
 EMACSFLAGS = -L .
 CASK = cask
