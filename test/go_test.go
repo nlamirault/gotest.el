@@ -22,6 +22,6 @@ type Suite struct {
 	suite.Suite
 }
 
-func (s *Suite) TestSuite() {
+func (s *Suite) TestIndividualTest() {
 	s.T().Log("logSuite")
 }

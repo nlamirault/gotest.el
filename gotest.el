@@ -172,7 +172,9 @@ For example, if the current buffer is `foo.go', the buffer for
                           (format "%s%s%s"
                                   go-test-regexp-prefix test-prefix
                                   go-test-regexp-suffix) nil t))
-        (match-string-no-properties 2)
+        (if (> (length (match-string-no-properties 1)) 0)
+            (concat "Test" (s-replace ")" "" (cadr (s-split "*" (match-string-no-properties 1)))))
+            (match-string-no-properties 2))
       (error "Unable to find a test"))))
 
 
