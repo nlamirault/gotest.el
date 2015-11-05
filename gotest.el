@@ -32,6 +32,7 @@
 
 (require 's)
 (require 'f)
+(require 'cl)
 (require 'go-mode)
 
 
@@ -64,6 +65,17 @@ A project based build tool for the Go programming language.
 See https://getgb.io."
   :type 'string
   :group 'gotest)
+
+(defvar go-test-regexp-prefix
+  "^[[:space:]]*func[[:space:]]\\(([^()]*?)\\)?[[:space:]]*\\("
+  "The prefix of the go-test regular expression.")
+
+(defvar go-test-regexp-suffix
+  "[[:alpha:][:digit:]_]*\\)("
+  "The suffix of the go-test regular expression.")
+
+(defvar go-test-prefixes '("Test" "Example")
+  "Prefixes to use when searching for tests.")
 
 
 (defvar go-test-compilation-error-regexp-alist-alist
@@ -153,26 +165,15 @@ For example, if the current buffer is `foo.go', the buffer for
 
 (defun go-test-get-current-test ()
   "Return the current test name."
-  (let ((start (point))
-        test-prefix
-        test-name)
-    (save-excursion
-      (end-of-line)
-      (setq test-prefix "Test")
-      (unless (and
-               (or
-                (search-backward-regexp "^[[:space:]]*func[[:space:]]*Test"
-                                        nil t)
-                (and
-                 (setq test-prefix "Example")
-                 (search-backward-regexp "^[[:space:]]*func[[:space:]]*Example"
-                                         nil t)))
-               (save-excursion (go-end-of-defun) (< start (point))))
-        (error "Unable to find a test"))
-      (save-excursion
-        (search-forward test-prefix)
-        (setq test-name (thing-at-point 'word))))
-    test-name))
+  (save-excursion
+    (end-of-line)
+    (if (cl-loop for test-prefix in go-test-prefixes
+                 thereis (search-backward-regexp
+                          (format "%s%s%s"
+                                  go-test-regexp-prefix test-prefix
+                                  go-test-regexp-suffix) nil t))
+        (match-string-no-properties 2)
+      (error "Unable to find a test"))))
 
 
 (defun go-test-get-current-file-tests ()

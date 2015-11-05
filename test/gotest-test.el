@@ -110,6 +110,14 @@
        (re-search-forward "logFoo")
        (should (string= "TestFoo" (go-test-get-current-test)))))))
 
+(ert-deftest test-go-test-get-current-test-when-suite-test ()
+  :tags '(find)
+  (with-test-sandbox
+   (with-current-buffer (find-file-noselect testsuite-buffer-name)
+     (save-excursion
+       (re-search-forward "logSuite")
+       (should (string= "TestSuite" (go-test-get-current-test)))))))
+
 (ert-deftest test-go-test-get-current-file-tests ()
   :tags '(find)
   (with-test-sandbox
