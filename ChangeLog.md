@@ -1,6 +1,11 @@
 # gotest.el ChangeLog
 
 
+# Version 0.7.0 (11/09/2015)
+
+- #23: Add support for github.com/stretchr/testify/suite (thanks IvanMalison)
+- Add some color output using compilation mode for unit tests
+
 # Version 0.6.0 (10/30/2015)
 
 - Init support for [gb][]
