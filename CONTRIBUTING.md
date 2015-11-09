@@ -17,13 +17,12 @@ try to follow these guidelines when you do so.
 
 ## Pull requests
 
-* Read [how to properly contribute to open source projects on Github][2].
 * Use a topic branch to easily amend a pull request later, if necessary.
-* Write [good commit messages][3].
 * Use the same coding conventions as the rest of the project.
 * Verify your Emacs Lisp code with `checkdoc`.
 * Open a [pull request][4] that relates to *only* one subject with a clear title
-  and description in grammatically correct, complete sentences.
+  and description in grammatically correct, complete sentences. (Target branch
+  must be `develop` branch.
 
 
 [1]: https://github.com/nlamirault/gotest.el/issues

@@ -32,6 +32,7 @@
 
 (require 's)
 (require 'f)
+(require 'cl)
 (require 'go-mode)
 
 
@@ -50,39 +51,6 @@ A project based build tool for the Go programming language.
 See https://getgb.io."
   :type 'string
   :group 'gotest)
-
-
-;; (defvar go-test-compilation-error-regexp-alist-alist
-;;   '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
-;;     (go-test-testify . ("^\tLocation:\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\)$" 1 2)) ;; testify package assert
-;;     (go-test-gopanic . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\) \\+0x\\(?:[0-9a-f]+\\)" 1 2)) ;; panic()
-;;     (go-test-compile . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\):\\([0-9]+\\): .*$" 1 2 3)) ;; go compiler
-;;     (go-test-linkage . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): undefined: .*$" 1 2))) ;; go linker
-;;   "Alist of values for `go-test-compilation-error-regexp-alist'.
-;; See also: `compilation-error-regexp-alist-alist'.")
-
-;; (defcustom go-test-compilation-error-regexp-alist
-;;   '(go-test-testing
-;;     go-test-testify
-;;     go-test-gopanic
-;;     go-test-compile
-;;     go-test-linkage)
-;;   "Alist that specifies how to match errors in go test output.
-;; The default set of regexps should only match the output of the
-;; standard `go' tool, which includes compile, link, stacktrace (panic)
-;; and package testing.  There is support for matching error output
-;; from other packages, such as `testify'.
-
-;; Only file names ending in `.go' will be matched by default.
-
-;; Instead of an alist element, you can use a symbol, which is
-;; looked up in `go-testcompilation-error-regexp-alist-alist'.
-
-;; See also: `compilation-error-regexp-alist'."
-;;   :type '(repeat (choice (symbol :tag "Predefined symbol")
-;; 			 (sexp :tag "Error specification")))
-;;   :group 'gotest)
-
 
 (defvar-local go-test-args nil
   "Arguments to pass to go test.
@@ -178,6 +146,50 @@ See https://getgb.io."
     (message "Go Test finished.")))
 
 
+(defvar go-test-regexp-prefix
+  "^[[:space:]]*func[[:space:]]\\(([^()]*?)\\)?[[:space:]]*\\("
+  "The prefix of the go-test regular expression.")
+
+(defvar go-test-regexp-suffix
+  "[[:alpha:][:digit:]_]*\\)("
+  "The suffix of the go-test regular expression.")
+
+(defvar go-test-prefixes '("Test" "Example")
+  "Prefixes to use when searching for tests.")
+
+
+(defvar go-test-compilation-error-regexp-alist-alist
+  '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
+    (go-test-testify . ("^\tLocation:\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\)$" 1 2)) ;; testify package assert
+    (go-test-gopanic . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\) \\+0x\\(?:[0-9a-f]+\\)" 1 2)) ;; panic()
+    (go-test-compile . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\):\\([0-9]+\\): .*$" 1 2 3)) ;; go compiler
+    (go-test-linkage . ("^\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): undefined: .*$" 1 2))) ;; go linker
+  "Alist of values for `go-test-compilation-error-regexp-alist'.
+See also: `compilation-error-regexp-alist-alist'.")
+
+(defcustom go-test-compilation-error-regexp-alist
+  '(go-test-testing
+    go-test-testify
+    go-test-gopanic
+    go-test-compile
+    go-test-linkage)
+  "Alist that specifies how to match errors in go test output.
+The default set of regexps should only match the output of the
+standard `go' tool, which includes compile, link, stacktrace (panic)
+and package testing.  There is support for matching error output
+from other packages, such as `testify'.
+
+Only file names ending in `.go' will be matched by default.
+
+Instead of an alist element, you can use a symbol, which is
+looked up in `go-testcompilation-error-regexp-alist-alist'.
+
+See also: `compilation-error-regexp-alist'."
+  :type '(repeat (choice (symbol :tag "Predefined symbol")
+			 (sexp :tag "Error specification")))
+  :group 'gotest)
+
+
 ;; Commands
 ;; -----------
 
@@ -247,10 +259,24 @@ For example, if the current buffer is `foo.go', the buffer for
         (setq name (thing-at-point 'word))))
     name))
 
-
 (defun go-test--get-current-test ()
   "Return the current test name."
-  (go-test--get-current-data "Test"))
+  (save-excursion
+    (end-of-line)
+    (if (cl-loop for test-prefix in go-test-prefixes
+                 thereis (search-backward-regexp
+                          (format "%s%s%s"
+                                  go-test-regexp-prefix test-prefix
+                                  go-test-regexp-suffix) nil t))
+        (if (> (length (match-string-no-properties 1)) 0)
+            (concat "Test" (s-replace ")" "" (cadr (s-split "*" (match-string-no-properties 1)))))
+            (match-string-no-properties 2))
+      (error "Unable to find a test"))))
+
+
+;; (defun go-test--get-current-test ()
+;;   "Return the current test name."
+;;   (go-test--get-current-data "Test"))
 
 
 (defun go-test--get-current-benchmark ()

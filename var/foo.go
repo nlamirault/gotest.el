@@ -1,2 +1,7 @@
-mode: set
-_/Users/nicolas/Projects/gotest.el/var/foo.go:7.13,9.2 1 0
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello gotest.el")
+}
