@@ -32,7 +32,7 @@
 
 (require 's)
 (require 'f)
-(require 'cl)
+(require 'cl-lib)
 (require 'go-mode)
 
 
