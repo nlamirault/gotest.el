@@ -259,8 +259,8 @@ For example, if the current buffer is `foo.go', the buffer for
         (setq name (thing-at-point 'word))))
     name))
 
-(defun go-test--get-current-test ()
-  "Return the current test name."
+(defun go-test--get-current-test-info ()
+  "Return the current test and suite name."
   (save-excursion
     (end-of-line)
     (if (cl-loop for test-prefix in go-test-prefixes
@@ -268,16 +268,12 @@ For example, if the current buffer is `foo.go', the buffer for
                           (format "%s%s%s"
                                   go-test-regexp-prefix test-prefix
                                   go-test-regexp-suffix) nil t))
-        (if (> (length (match-string-no-properties 1)) 0)
-            (concat "Test" (s-replace ")" "" (cadr (s-split "*" (match-string-no-properties 1)))))
-            (match-string-no-properties 2))
+        (list (match-string-no-properties 1) (match-string-no-properties 2))
       (error "Unable to find a test"))))
 
-
-;; (defun go-test--get-current-test ()
-;;   "Return the current test name."
-;;   (go-test--get-current-data "Test"))
-
+(defun go-test--get-current-test ()
+  "Return the current test name."
+  (cadr (go-test--get-current-test-info)))
 
 (defun go-test--get-current-benchmark ()
   "Return the current benchmark name."
@@ -361,7 +357,6 @@ For example, if the current buffer is `foo.go', the buffer for
 `ARGS' corresponds to go command line arguments."
   (s-concat go-command " run " args))
 
-
 (defun go-test--go-run-arguments ()
   "Arguments for go run."
   (let ((opts (if go-run-args
@@ -417,11 +412,14 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-test ()
   "Launch go test on the current test."
   (interactive)
-  (let ((test-name (go-test--get-current-test)))
+  (let* ((test-info (go-test--get-current-test-info))
+         (test-name (cadr test-info))
+         (test-suite (car test-info))
+         (test-flag (if (length test-suite) "-m " "-run ")))
     (when test-name
       (if (go-test--is-gb-project)
           (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "$"))
-        (go-test--go-test (s-concat "-run " test-name "$"))))))
+        (go-test--go-test (s-concat test-flag test-name "$"))))))
 
 
 ;;;###autoload
