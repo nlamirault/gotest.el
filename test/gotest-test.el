@@ -116,7 +116,7 @@
    (with-current-buffer (find-file-noselect testsuite-buffer-name)
      (save-excursion
        (re-search-forward "logSuite")
-       (should (string= "TestSuite" (go-test--get-current-test)))))))
+       (should (string= "TestIndividualTest" (go-test--get-current-test)))))))
 
 (ert-deftest test-go-test-get-current-file-tests ()
   :tags '(find)
