@@ -2,7 +2,7 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.7.0
+;; Version: 0.8.0
 ;; Keywords: languages, go, tests
 
 ;; Package-Requires: ((emacs "24.3") (s "1.10.0") (f "0.18.0") (go-mode "1.3.1"))
@@ -194,10 +194,19 @@ See also: `compilation-error-regexp-alist'."
 ;; -----------
 
 
-(defun go-test--get-program (args)
+(defun go-test--get-program (args &optional env)
   "Return the command to launch unit test.
+`ARGS' corresponds to go command line arguments.
+When `ENV' concatenate before command."
+  (if env
+      (s-concat env " " go-command " test " args)
+    (s-concat go-command " test " args)))
+
+
+(defun go-test--gb-get-program (args)
+  "Return the command to launch unit test using GB..
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-command " test " args))
+  (s-concat gb-command " test " args))
 
 
 (defun go-test--get-arguments (defaults history)
@@ -212,12 +221,6 @@ When any other prefix argument is given, prompt for arguments using HISTORY."
                (prompt (s-concat "go " name " args: ")))
           (read-shell-command prompt defaults history)))
     defaults))
-
-
-(defun go-test--gb-get-program (args)
-  "Return the command to launch unit test using GB..
-`ARGS' corresponds to go command line arguments."
-  (s-concat gb-command " test " args))
 
 
 (defun go-test--get-root-directory()
@@ -341,11 +344,11 @@ For example, if the current buffer is `foo.go', the buffer for
 ;;   (compile (go-test--get-program (go-test--arguments args)))
 ;;   (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
 
-(defun go-test--go-test (args)
+(defun go-test--go-test (args &optional env)
   "Start the go test command using `ARGS'."
   (let ((buffer "*Go Test*")) ; (concat "*go-test " args "*")))
     (go-test--cleanup buffer)
-    (compilation-start (go-test--get-program (go-test--arguments args))
+    (compilation-start (go-test--get-program (go-test--arguments args) env)
                        'go-test-mode
                        'go-test--compilation-name)
     (with-current-buffer "*Go Test*"
@@ -400,6 +403,13 @@ For example, if the current buffer is `foo.go', the buffer for
       (rename-buffer buffer))
     (set-process-sentinel (get-buffer-process buffer) 'go-test--finished-sentinel)))
 
+
+(defun go-test--gb-find-package ()
+  "Find package of current-file."
+  (let* ((dir (s-concat (go-test--get-root-directory) "src/"))
+         (filename (buffer-file-name))
+         (pkg (f-filename filename)))
+    (s-replace-all (list (cons dir "") (cons pkg "")) filename)))
 
 ; API
 ;; ----
@@ -480,11 +490,16 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-coverage ()
   "Launch go test coverage on the current project."
   (interactive)
-  (let ((args (s-concat
-               "--coverprofile="
-               (expand-file-name
-                (read-file-name "Coverage file" nil "cover.out")) " ./...")))
-    (go-test--go-test args)))
+  (if (go-test--is-gb-project)
+      (let* ((package (go-test--gb-find-package))
+             (root-dir (go-test--get-root-directory))
+             (gopath (s-concat "env GOPATH=" root-dir ":" root-dir "vendor")))
+        (go-test--go-test (s-concat "-cover " package) gopath))
+    (let ((args (s-concat
+                 "--coverprofile="
+                 (expand-file-name
+                  (read-file-name "Coverage file" nil "cover.out")) " ./...")))
+      (go-test--go-test args))))
 
 
 ;;;###autoload

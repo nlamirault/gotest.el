@@ -1,5 +1,9 @@
 # gotest.el ChangeLog
 
+# Version 0.8.0 (11/30/2015)
+
+- #25: use -m flag for suite tests (only use -m when length > 0) (thanks IvanMalison)
+- #24: Load cl-lib.el instead of cl.el (thanks syohex)
 
 # Version 0.7.0 (11/09/2015)
 
