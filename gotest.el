@@ -133,7 +133,7 @@ See https://getgb.io."
   (setq major-mode 'go-test-mode)
   (setq mode-name "Go-Test")
   (setq-local truncate-lines t)
-  (run-hooks 'go-test-mode-hook)
+  ;;(run-hooks 'go-test-mode-hook)
   (font-lock-add-keywords nil go-test-font-lock-keywords))
 
 (defun go-test--compilation-name (mode-name)
@@ -506,10 +506,10 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-run ()
   "Launch go run on current buffer file."
   (interactive)
-  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  ;;(add-hook 'compilation-start-hook 'go-test-compilation-hook)
   (compile (go-test--go-run-get-program (go-test--go-run-arguments)))
-  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
-
+  ;;(remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+  )
 
 
 

@@ -127,7 +127,7 @@
 
 ;; when current buffer 'go.go', Test names should be found in 'go_test.go'
 (ert-deftest test-go-test-get-current-file-tests-other ()
-  :tags '(find)
+  :tags '(find current)
   (with-test-sandbox
    (with-current-buffer (find-file-noselect (f-join go-test-testsuite-dir "go.go"))
      (should (string= "TestFoo|TestBar|Test_Baz"
