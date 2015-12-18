@@ -449,11 +449,7 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let* ((tests (go-test--get-current-file-tests))
-         (examples (go-test--get-current-file-examples))
-         (data (if (> (length examples) 0)
-                   (s-concat tests "|" examples)
-                 tests)))
+  (let ((data (go-test--get-current-file-testing-data)))
     (if (go-test--is-gb-project)
         (go-test--gb-start (s-concat "-test.v=true -test.run='" data "'"))
       (go-test--go-test (s-concat "-run='" data "'")))))
