@@ -321,6 +321,19 @@ For example, if the current buffer is `foo.go', the buffer for
   (go-test--get-current-file-data "Example"))
 
 
+(defun go-test--get-current-file-testing-data ()
+  "Regex with unit test and|or examples."
+  (let ((tests (go-test--get-current-file-tests))
+        (examples (go-test--get-current-file-examples)))
+    (cond ((and (> (length tests) 0)
+                (> (length examples) 0))
+           (s-concat tests "|" examples))
+          ((= (length tests) 0)
+           examples)
+          ((= (length examples) 0)
+           tests))))
+
+
 (defun go-test--arguments (args)
   "Make the go test command argurments using `ARGS'."
   (let ((opts args))
