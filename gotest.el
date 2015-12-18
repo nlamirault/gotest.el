@@ -2,7 +2,7 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.8.0
+;; Version: 0.9.0
 ;; Keywords: languages, go, tests
 
 ;; Package-Requires: ((emacs "24.3") (s "1.10.0") (f "0.18.0") (go-mode "1.3.1"))
@@ -133,7 +133,7 @@ See https://getgb.io."
   (setq major-mode 'go-test-mode)
   (setq mode-name "Go-Test")
   (setq-local truncate-lines t)
-  (run-hooks 'go-test-mode-hook)
+  ;;(run-hooks 'go-test-mode-hook)
   (font-lock-add-keywords nil go-test-font-lock-keywords))
 
 (defun go-test--compilation-name (mode-name)
@@ -438,7 +438,9 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let* ((tests (go-test--get-current-file-tests))
          (examples (go-test--get-current-file-examples))
-         (data (s-concat tests "|" examples)))
+         (data (if (> (length examples) 0)
+                   (s-concat tests "|" examples)
+                 tests)))
     (if (go-test--is-gb-project)
         (go-test--gb-start (s-concat "-test.v=true -test.run='" data "'"))
       (go-test--go-test (s-concat "-run='" data "'")))))
@@ -506,10 +508,10 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-run ()
   "Launch go run on current buffer file."
   (interactive)
-  (add-hook 'compilation-start-hook 'go-test-compilation-hook)
+  ;;(add-hook 'compilation-start-hook 'go-test-compilation-hook)
   (compile (go-test--go-run-get-program (go-test--go-run-arguments)))
-  (remove-hook 'compilation-start-hook 'go-test-compilation-hook))
-
+  ;;(remove-hook 'compilation-start-hook 'go-test-compilation-hook))
+  )
 
 
 

@@ -1,6 +1,6 @@
 ;;; gotest-test.el --- Tests for gotest.el
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -127,7 +127,7 @@
 
 ;; when current buffer 'go.go', Test names should be found in 'go_test.go'
 (ert-deftest test-go-test-get-current-file-tests-other ()
-  :tags '(find)
+  :tags '(find current)
   (with-test-sandbox
    (with-current-buffer (find-file-noselect (f-join go-test-testsuite-dir "go.go"))
      (should (string= "TestFoo|TestBar|Test_Baz"
