@@ -1,5 +1,9 @@
 # gotest.el ChangeLog
 
+# Version 0.10.0 (IN PROGRESS)
+
+- #32: Can't install package in melpa stable
+
 # Version 0.9.0 (12/18/2015)
 
 - #30: Remove extra  when no examples in file
