@@ -1,8 +1,10 @@
 # gotest.el ChangeLog
 
-# Version 0.10.0 (IN PROGRESS)
+# Version 0.10.0 (01/25/2016)
 
 - #32: Can't install package in melpa stable
+- Refactoring testing current file
+- #30: Tests with only tests or examples
 
 # Version 0.9.0 (12/18/2015)
 
