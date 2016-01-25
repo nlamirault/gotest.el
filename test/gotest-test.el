@@ -32,6 +32,12 @@
 ;;   (concat testsuite-dir "go_test.go")
 ;;   "File name for testing.")
 
+
+(require 'f)
+(require 's)
+
+
+
 (defconst testsuite-buffer-name
   (f-join go-test-testsuite-dir "go_test.go")
   "File name for testing.")
@@ -127,7 +133,7 @@
 
 ;; when current buffer 'go.go', Test names should be found in 'go_test.go'
 (ert-deftest test-go-test-get-current-file-tests-other ()
-  :tags '(find current)
+  :tags '(find )
   (with-test-sandbox
    (with-current-buffer (find-file-noselect (f-join go-test-testsuite-dir "go.go"))
      (should (string= "TestFoo|TestBar|Test_Baz"
@@ -140,6 +146,31 @@
    (with-current-buffer (find-file-noselect
                          (concat go-test-testsuite-dir "no.go"))
      (should-error (go-test--get-current-file-tests)))))
+
+
+(ert-deftest test-go-test-get-current-file-tests-with-only-tests ()
+  :tags '(find current)
+  (with-test-sandbox
+   (with-current-buffer
+       (find-file-noselect (concat go-test-testsuite-dir "/go_test.go"))
+     (should (string= "TestFoo|TestBar|Test_Baz"
+                      (go-test--get-current-file-testing-data))))))
+
+(ert-deftest test-go-test-get-current-file-tests-with-only-examples ()
+  :tags '(find current)
+  (with-test-sandbox
+   (with-current-buffer
+       (find-file-noselect (concat go-test-testsuite-dir "/foo_test.go"))
+     (should (string= "ExampleA|ExampleB|ExampleC"
+                      (go-test--get-current-file-testing-data))))))
+
+(ert-deftest test-go-test-get-current-file-tests ()
+  :tags '(find current)
+  (with-test-sandbox
+   (with-current-buffer
+       (find-file-noselect (concat go-test-testsuite-dir "/bar_test.go"))
+     (should (string= "TestFoo|TestBar|Test_Baz|ExampleA|ExampleB|ExampleC"
+                      (go-test--get-current-file-testing-data))))))
 
 ;; Error Regexp
 

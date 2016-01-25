@@ -2,10 +2,10 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.9.0
+;; Version: 0.10.0
 ;; Keywords: languages, go, tests
 
-;; Package-Requires: ((emacs "24.3") (s "1.10.0") (f "0.18.0") (go-mode "1.3.1"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.17.3") (go-mode "1.3.1"))
 
 ;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -321,6 +321,19 @@ For example, if the current buffer is `foo.go', the buffer for
   (go-test--get-current-file-data "Example"))
 
 
+(defun go-test--get-current-file-testing-data ()
+  "Regex with unit test and|or examples."
+  (let ((tests (go-test--get-current-file-tests))
+        (examples (go-test--get-current-file-examples)))
+    (cond ((and (> (length tests) 0)
+                (> (length examples) 0))
+           (s-concat tests "|" examples))
+          ((= (length tests) 0)
+           examples)
+          ((= (length examples) 0)
+           tests))))
+
+
 (defun go-test--arguments (args)
   "Make the go test command argurments using `ARGS'."
   (let ((opts args))
@@ -436,11 +449,7 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let* ((tests (go-test--get-current-file-tests))
-         (examples (go-test--get-current-file-examples))
-         (data (if (> (length examples) 0)
-                   (s-concat tests "|" examples)
-                 tests)))
+  (let ((data (go-test--get-current-file-testing-data)))
     (if (go-test--is-gb-project)
         (go-test--gb-start (s-concat "-test.v=true -test.run='" data "'"))
       (go-test--go-test (s-concat "-run='" data "'")))))

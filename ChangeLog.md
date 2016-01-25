@@ -1,5 +1,16 @@
 # gotest.el ChangeLog
 
+# Version 0.10.0 (01/25/2016)
+
+- #32: Can't install package in melpa stable
+- Refactoring testing current file
+- #30: Tests with only tests or examples
+
+# Version 0.9.0 (12/18/2015)
+
+- #30: Remove extra  when no examples in file
+- Cleanup removing unused hook
+
 # Version 0.8.0 (11/30/2015)
 
 - #25: use -m flag for suite tests (only use -m when length > 0) (thanks IvanMalison)
