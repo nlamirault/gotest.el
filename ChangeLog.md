@@ -1,5 +1,10 @@
 # gotest.el ChangeLog
 
+# Version 0.11.0 (02/26/2016)
+
+- #34: Fix gb project detection (thanks dougm)
+- `FIX` CircleCI build (Emacs24 as default version)
+
 # Version 0.10.0 (01/25/2016)
 
 - #32: Can't install package in melpa stable
