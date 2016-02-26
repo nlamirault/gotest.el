@@ -1,6 +1,6 @@
 ;;; gotest-version-test.el --- Tests for version information
 
-;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015, 2016 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -24,11 +24,11 @@
 
 (require 'test-helper)
 
-(ert-deftest phpunit-mode-library-version ()
+(ert-deftest test-go-test-library-version ()
   :expected-result (if (executable-find "cask") :passed :failed)
-  (let* ((cask-version (car (process-lines "cask" "version"))))
+  (let* ((cask-version (car (last (process-lines "cask" "version")))))
     (message "gotest.el Cask version: %s" cask-version)
-    (should (string= "0.10.0" cask-version))))
+    (should (string= "0.11.0" cask-version))))
 
 
 (provide 'gotest-version-test)

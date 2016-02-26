@@ -2,12 +2,12 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/gotest.el
-;; Version: 0.10.0
+;; Version: 0.11.0
 ;; Keywords: languages, go, tests
 
 ;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.17.3") (go-mode "1.3.1"))
 
-;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015, 2016 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@
   :type 'boolean
   :group 'gotest)
 
-(defcustom gb-command "gb"
+(defcustom go-test-gb-command "gb"
   "The 'gb' command.
 A project based build tool for the Go programming language.
 See https://getgb.io."
@@ -206,7 +206,7 @@ When `ENV' concatenate before command."
 (defun go-test--gb-get-program (args)
   "Return the command to launch unit test using GB..
 `ARGS' corresponds to go command line arguments."
-  (s-concat gb-command " test " args))
+  (s-concat go-test-gb-command " test " args))
 
 
 (defun go-test--get-arguments (defaults history)
@@ -391,11 +391,12 @@ For example, if the current buffer is `foo.go', the buffer for
 
 (defun go-test--is-gb-project ()
   "Check if project use GB or not."
-  (let* ((root-dir (go-test--get-root-directory))
-         (vendor-dir (s-concat root-dir "vendor"))
-         (manifest (s-concat vendor-dir "/manifest")))
-    (and (f-dir? vendor-dir)
-         (f-exists? manifest))))
+  (let* ((go-test-gb-command (executable-find go-test-gb-command))
+         (default-directory (if go-test-gb-command (go-test--get-root-directory))))
+    (and go-test-gb-command
+         default-directory
+         (f-dir? "src")
+         (f-exists? "vendor/manifest"))))
 
 (defun go-test--cleanup (buffer)
   "Clean up the old go-test process BUFFER when a similar process is run."

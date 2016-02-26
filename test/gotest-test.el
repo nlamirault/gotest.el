@@ -1,6 +1,6 @@
 ;;; gotest-test.el --- Tests for gotest.el
 
-;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015, 2016 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -105,6 +105,23 @@
        (should (string= (go-run-command
                          (s-concat testsuite-buffer-name " -foo"))
                         (go-test--go-run-get-program (go-test--go-run-arguments))))))))
+
+(ert-deftest test-go-test--is-gb-project ()
+  :tags '(arguments)
+  (with-test-sandbox
+   (let ((go-test-gb-command "a-program-name-that-does-not-exist"))
+     (should (null (go-test--is-gb-project))))
+   (let ((go-test-gb-command "go"))
+     (should (null (go-test--is-gb-project))))
+   (let ((go-test-gb-command "go")
+         (default-directory (expand-file-name "test/.cask/gb-fake-project")))
+     (make-directory "src" t)
+     (make-directory "vendor" t)
+     (with-temp-buffer
+       (write-file "Makefile")
+       (write-file "vendor/manifest"))
+     (with-current-buffer (find-file-noselect "Makefile")
+       (should (go-test--is-gb-project))))))
 
 ;; Find
 

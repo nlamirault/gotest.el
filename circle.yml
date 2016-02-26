@@ -15,6 +15,7 @@ dependencies:
     - sudo add-apt-repository -y ppa:ubuntu-elisp/ppa
     - sudo apt-get update
     - sudo apt-get install -qq emacs24-nox emacs-snapshot
+    - sudo update-alternatives --set emacs /usr/bin/emacs24-nox
     - curl -fsSkL "https://raw.github.com/cask/cask/master/go" | python
     - export PATH="${HOME}/.cask/bin:$PATH"
 test:
