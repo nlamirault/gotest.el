@@ -24,9 +24,9 @@
 
 (require 'test-helper)
 
-(ert-deftest phpunit-mode-library-version ()
+(ert-deftest test-go-test-library-version ()
   :expected-result (if (executable-find "cask") :passed :failed)
-  (let* ((cask-version (car (process-lines "cask" "version"))))
+  (let* ((cask-version (car (last (process-lines "cask" "version")))))
     (message "gotest.el Cask version: %s" cask-version)
     (should (string= "0.11.0" cask-version))))
 
