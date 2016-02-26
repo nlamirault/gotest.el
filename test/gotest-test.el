@@ -106,6 +106,23 @@
                          (s-concat testsuite-buffer-name " -foo"))
                         (go-test--go-run-get-program (go-test--go-run-arguments))))))))
 
+(ert-deftest test-go-test--is-gb-project ()
+  :tags '(arguments)
+  (with-test-sandbox
+   (let ((go-test-gb-command "a-program-name-that-does-not-exist"))
+     (should (null (go-test--is-gb-project))))
+   (let ((go-test-gb-command "go"))
+     (should (null (go-test--is-gb-project))))
+   (let ((go-test-gb-command "go")
+         (default-directory (expand-file-name "test/.cask/gb-fake-project")))
+     (make-directory "src" t)
+     (make-directory "vendor" t)
+     (with-temp-buffer
+       (write-file "Makefile")
+       (write-file "vendor/manifest"))
+     (with-current-buffer (find-file-noselect "Makefile")
+       (should (go-test--is-gb-project))))))
+
 ;; Find
 
 (ert-deftest test-go-test-get-current-test ()
