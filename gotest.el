@@ -442,8 +442,8 @@ For example, if the current buffer is `foo.go', the buffer for
          (test-flag (if (> (length test-suite) 0) "-m " "-run ")))
     (when test-name
       (if (go-test--is-gb-project)
-          (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "$"))
-        (go-test--go-test (s-concat test-flag test-name "$"))))))
+          (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$"))
+        (go-test--go-test (s-concat test-flag test-name "\\$"))))))
 
 
 ;;;###autoload
@@ -476,7 +476,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (let ((benchmark-name (go-test--get-current-benchmark)))
     (when benchmark-name
-      (go-test--go-test (s-concat "-run ^NOTHING -bench " benchmark-name "$")))))
+      (go-test--go-test (s-concat "-run ^NOTHING -bench " benchmark-name "\\$")))))
 
 
 ;;;###autoload
