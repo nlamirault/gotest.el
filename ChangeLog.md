@@ -1,5 +1,9 @@
 # gotest.el ChangeLog
 
+# Version 0.12.0 (14/04/2016)
+
+- #37: for fish shell compatibility, strictly escape $ (thanks Eric Drechsel)
+
 # Version 0.11.0 (02/26/2016)
 
 - #34: Fix gb project detection (thanks dougm)

@@ -28,7 +28,7 @@
   :expected-result (if (executable-find "cask") :passed :failed)
   (let* ((cask-version (car (last (process-lines "cask" "version")))))
     (message "gotest.el Cask version: %s" cask-version)
-    (should (string= "0.11.0" cask-version))))
+    (should (string= "0.12.0" cask-version))))
 
 
 (provide 'gotest-version-test)
