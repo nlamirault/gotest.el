@@ -271,8 +271,17 @@ For example, if the current buffer is `foo.go', the buffer for
                           (format "%s%s%s"
                                   go-test-regexp-prefix test-prefix
                                   go-test-regexp-suffix) nil t))
-        (list (match-string-no-properties 1) (match-string-no-properties 2))
+        (let ((suite-match (match-string-no-properties 1))
+              (test-match (match-string-no-properties 2)))
+          (list
+           (go-test--get-suite-name-from-match-string suite-match) test-match))
       (error "Unable to find a test"))))
+
+(defun go-test--get-suite-name-from-match-string (the-match-string)
+  (if (> (length the-match-string) 0)
+      (progn (string-match "([^()]*?\\*\\([^()]*?\\))" the-match-string)
+             (s-trim (match-string-no-properties 1 the-match-string)))
+    ""))
 
 (defun go-test--get-current-test ()
   "Return the current test name."
