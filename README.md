@@ -1,15 +1,9 @@
 # gotest.el
 
 [![License GPL 3][badge-license]][LICENSE]
-[![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
 
-Master :
-* [![MELPA Stable](https://stable.melpa.org/packages/gotest-badge.svg)](https://stable.melpa.org/#/gotest)
-* [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/master.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/master)
-
-Develop:
-* [![Melpa Status](https://melpa.org/packages/gotest-badge.svg)](https://melpa.org/#/gotest)
-* [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/develop.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/develop)
+* Master : [![MELPA Stable](https://stable.melpa.org/packages/gotest-badge.svg)](https://stable.melpa.org/#/gotest) [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/master.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/master) [![Coverage Status](https://coveralls.io/repos/nlamirault/gotest.el/badge.png?branch=master)](https://coveralls.io/r/nlamirault/gotest.el?branch=master)
+* Develop: [![Melpa Status](https://melpa.org/packages/gotest-badge.svg)](https://melpa.org/#/gotest) [![Circle CI](https://circleci.com/gh/nlamirault/gotest.el/tree/develop.svg?style=svg)](https://circleci.com/gh/nlamirault/gotest.el/tree/develop) [![Coverage Status](https://coveralls.io/repos/github/nlamirault/gotest.el/badge.svg?branch=develop)](https://coveralls.io/github/nlamirault/gotest.el?branch=develop)
 
 Run [Go](http://golang.org) tests and programs from Emacs (>= 24.3)
 
