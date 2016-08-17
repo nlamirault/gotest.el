@@ -160,9 +160,6 @@ arguments in that order.")
   "[[:alpha:][:digit:]_]*\\)("
   "The suffix of the go-test regular expression.")
 
-(defvar go-test-prefixes '("Test" "Example")
-  "Prefixes to use when searching for tests.")
-
 
 (defvar go-test-compilation-error-regexp-alist-alist
   '((go-test-testing . ("^\t\\([[:alnum:]-_/.]+\\.go\\):\\([0-9]+\\): .*$" 1 2)) ;; stdlib package testing
@@ -272,11 +269,9 @@ For example, if the current buffer is `foo.go', the buffer for
   "Return the current test and suite name."
   (save-excursion
     (end-of-line)
-    (if (cl-loop for test-prefix in go-test-prefixes
-                 thereis (search-backward-regexp
-                          (format "%s%s%s"
-                                  go-test-regexp-prefix test-prefix
-                                  go-test-regexp-suffix) nil t))
+    (if (search-backward-regexp
+         (format "%s\\(Test\\|Example\\)%s" go-test-regexp-prefix go-test-regexp-suffix)
+         nil t)
         (let ((suite-match (match-string-no-properties 1))
               (test-match (match-string-no-properties 2)))
           (list
