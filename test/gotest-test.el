@@ -189,6 +189,14 @@
      (should (string= "TestFoo|TestBar|Test_Baz|ExampleA|ExampleB|ExampleC"
                       (go-test--get-current-file-testing-data))))))
 
+(ert-deftest test-go-test-get-current-test ()
+  :tags '(find)
+  (with-test-sandbox
+   (with-current-buffer (find-file-noselect (concat go-test-testsuite-dir "/bar_test.go"))
+     (save-excursion
+       (re-search-forward "Example A")
+       (should (string= "ExampleA" (go-test--get-current-test)))))))
+
 ;; Error Regexp
 
 ;; (ert-deftest test-go-test-compilation-error-regexp-matches ()
