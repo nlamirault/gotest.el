@@ -216,14 +216,17 @@ When `ENV' concatenate before command."
   "Get optional arguments for go test or go run.
 DEFAULTS will be used when there is no prefix argument.
 When a prefix argument of '- is given, use the most recent HISTORY item.
-When any other prefix argument is given, prompt for arguments using HISTORY."
-  (if current-prefix-arg
-      (if (equal current-prefix-arg '-)
-          (car (symbol-value history))
-        (let* ((name (nth 1 (s-split "-" (symbol-name history))))
-               (prompt (s-concat "go " name " args: ")))
-          (read-shell-command prompt defaults history)))
-    defaults))
+When single prefix argument is given, prompt for arguments using HISTORY.
+When double prefix argument is given, run command in compilation buffer with
+`comint-mode' enabled.
+When triple prefix argument is given, prompt for arguments using HISTORY and
+run command in compilation buffer `comint-mode' enabled."
+  (pcase current-prefix-arg
+    (`nil defaults)
+    ((or `- `(16)) (car (symbol-value history)))
+    ((or `(4) `(64)) (let* ((name (nth 1 (s-split "-" (symbol-name history))))
+                            (prompt (s-concat "go " name " args: ")))
+                       (read-shell-command prompt defaults history)))))
 
 
 (defun go-test--get-root-directory()
@@ -526,11 +529,13 @@ For example, if the current buffer is `foo.go', the buffer for
 
 
 ;;;###autoload
-(defun go-run ()
+(defun go-run (&optional args)
   "Launch go run on current buffer file."
   (interactive)
   ;;(add-hook 'compilation-start-hook 'go-test-compilation-hook)
-  (compile (go-test--go-run-get-program (go-test--go-run-arguments)))
+  (compile (go-test--go-run-get-program (go-test--go-run-arguments))
+           (pcase current-prefix-arg
+             ((or `(16) `(64)) t)))
   ;;(remove-hook 'compilation-start-hook 'go-test-compilation-hook))
   )
 
