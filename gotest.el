@@ -415,11 +415,12 @@ For example, if the current buffer is `foo.go', the buffer for
 
 (defun go-test--cleanup (buffer)
   "Clean up the old go-test process BUFFER when a similar process is run."
-  (when (get-buffer-process (get-buffer buffer))
-    (delete-process buffer))
   (when (get-buffer buffer)
-    (kill-buffer buffer)))
-
+    (when (get-buffer-process (get-buffer buffer))
+      (delete-process buffer))
+    (with-current-buffer buffer
+      (setq buffer-read-only nil)
+      (erase-buffer))))
 
 (defun go-test--gb-start (args)
   "Start the GB test command using `ARGS'."
