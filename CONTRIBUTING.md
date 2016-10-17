@@ -22,7 +22,7 @@ try to follow these guidelines when you do so.
 * Verify your Emacs Lisp code with `checkdoc`.
 * Open a [pull request][4] that relates to *only* one subject with a clear title
   and description in grammatically correct, complete sentences. (Target branch
-  must be `develop` branch.
+  must be `develop` branch)
 
 
 [1]: https://github.com/nlamirault/gotest.el/issues
