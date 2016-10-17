@@ -1,5 +1,14 @@
 # gotest.el ChangeLog
 
+# Version 0.13.0 (10/17/2016)
+
+- #48: Re-use the test output buffer if it is shown (Thanks Andreas Fuchs)
+- #47: Anchor font-lock-keywords at BoL & add subtest support (Thanks Andreas Fuchs)
+- #46: Pass . as the package name in current-{test,file} (Thanks Andreas Fuchs)
+- #43: Add support for compilation with comint-mode enabled (Thanks Novak Boškov)
+- #41: Fix running ExampleFoo that follows TestFoo (Thanks Konstantin Shaposhnikov)
+- #39: add-custom-arguments-function (Thanks IvanMalison)
+
 # Version 0.12.0 (14/04/2016)
 
 - #37: for fish shell compatibility, strictly escape $ (thanks Eric Drechsel)
