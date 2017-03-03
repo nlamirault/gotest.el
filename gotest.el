@@ -527,7 +527,7 @@ For example, if the current buffer is `foo.go', the buffer for
     (let ((args (s-concat
                  "--coverprofile="
                  (expand-file-name
-                  (read-file-name "Coverage file" nil "cover.out")) " ./...")))
+                  (read-file-name "Coverage file" nil "cover.out")) " ./.")))
       (go-test--go-test args))))
 
 
