@@ -479,7 +479,10 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (if (go-test--is-gb-project)
       (go-test--gb-start "all -test.v=true")
-    (go-test--go-test "./...")))
+    (let ((packages (cl-remove-if (lambda (s) (s-contains? "/vendor/" s))
+                                  (s-split "\n"
+                                           (shell-command-to-string "go list ./...")))))
+      (go-test--go-test (s-join " " packages)))))
 
 
 
