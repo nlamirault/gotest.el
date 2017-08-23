@@ -5,7 +5,7 @@
 ;; Version: 0.14.0
 ;; Keywords: languages, go, tests
 
-;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.19.0") (go-mode "1.4.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.19.0") (go-mode "1.5.0"))
 
 ;; Copyright (C) 2014, 2015, 2016, 2017 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
