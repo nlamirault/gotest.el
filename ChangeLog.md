@@ -1,5 +1,12 @@
 # gotest.el ChangeLog
 
+# Version 0.14.0 (08/23/2017)
+
+- #56: add vendoring support to go-test-current-project (Thanks Sergey Kostyaev)
+- #55: Make column in compiler message regex optional (Thanks Andreas Fuchs)
+- #54: No longer provide a feature in test-helper.el (Thanks Jonas Bernoulli)
+- #52: Fixed test profile multiple packages issue (Thanks Junjie Nan)
+
 # Version 0.13.0 (10/17/2016)
 
 - #48: Re-use the test output buffer if it is shown (Thanks Andreas Fuchs)
