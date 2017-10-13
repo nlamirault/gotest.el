@@ -249,6 +249,8 @@ For example, if the current buffer is `foo.go', the buffer for
       (current-buffer)
     (let ((ff-always-try-to-create nil))
       (let ((filename (ff-other-file-name)))
+        (unless filename
+          (user-error (format "Unable to find a test file for file %s" buffer-file-name)))
         (message "File :%s" filename)
         (find-file-noselect filename)))))
 

@@ -42,6 +42,10 @@
   (f-join go-test-testsuite-dir "go_test.go")
   "File name for testing.")
 
+(defconst testsuite-file-with-no-test-file-name
+  (f-join go-test-testsuite-dir "idonothavetests.go")
+  "Name of a file that does not have corresponding _test.go file")
+
 ;; (load (expand-file-name "../gotest" testsuite-dir) nil :no-message)
 ;; (load (expand-file-name "test-helper.el" testsuite-dir) nil :no-message)
 
@@ -196,6 +200,13 @@
      (save-excursion
        (re-search-forward "Example A")
        (should (string= "ExampleA" (go-test--get-current-test)))))))
+
+(ert-deftest test-go-test-get-current-buffer ()
+  :tags '(current)
+  (with-test-sandbox
+   (let ((buffer-file-name testsuite-file-with-no-test-file-name))
+     (should-error (go-test--get-current-buffer)
+                   :type 'user-error))))
 
 ;; Error Regexp
 
