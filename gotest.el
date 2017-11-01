@@ -462,7 +462,7 @@ For example, if the current buffer is `foo.go', the buffer for
       (when test-name
         (if (go-test--is-gb-project)
             (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$ ."))
-          (go-test--go-test (s-concat test-flag test-name additional-arguments "\\$ .")))))))
+          (go-test--go-test (s-concat test-flag test-name "\\$" additional-arguments "\\$ .")))))))
 
 
 ;;;###autoload
