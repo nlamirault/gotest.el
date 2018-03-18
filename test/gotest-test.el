@@ -106,6 +106,16 @@
                          (s-concat testsuite-buffer-name " -foo"))
                         (go-test--go-run-get-program (go-test--go-run-arguments))))))))
 
+(ert-deftest test-go-run-command-with-numeric-prefix ()
+  :tags '(arguments)
+  (with-test-sandbox
+   (with-current-buffer (find-file-noselect testsuite-buffer-name)
+     (let ((current-prefix-arg '10)
+           (go-run-args "-foo=x"))
+       (should (string= (go-run-command
+                         (s-concat "-count=10 " testsuite-buffer-name " -foo=x"))
+                        (go-test--go-run-get-program (go-test--go-run-arguments))))))))
+
 (ert-deftest test-go-test--is-gb-project ()
   :tags '(arguments)
   (with-test-sandbox
