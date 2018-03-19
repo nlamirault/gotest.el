@@ -150,6 +150,7 @@ arguments in that order.")
 
 (defun go-test--finished-sentinel (process event)
   "Execute after PROCESS return and EVENT is 'finished'."
+  (compilation-sentinel process event)
   (when (equal event "finished\n")
     (message "Go Test finished.")))
 
