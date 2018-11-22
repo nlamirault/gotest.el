@@ -458,7 +458,7 @@ For example, if the current buffer is `foo.go', the buffer for
   "Launch go test on the current test."
   (interactive)
   (cl-destructuring-bind (test-suite test-name) (go-test--get-current-test-info)
-    (let ((test-flag (if (> (length test-suite) 0) "-m " "-run "))
+    (let ((test-flag (if (> (length test-suite) 0) "-testify.m " "-run "))
           (additional-arguments (if go-test-additional-arguments-function
                                     (funcall go-test-additional-arguments-function
                                              test-suite test-name) "")))
