@@ -36,6 +36,10 @@ prompting.  For example: <kbd>M-- M-x go-run</kbd>.
 
 Launch unit tests for the current test.
 
+### go-test-current-test-cache
+
+Rerun the current test.
+
 ### go-test-current-file
 
 Launch unit tests and examples for the current file
