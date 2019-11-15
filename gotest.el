@@ -155,6 +155,10 @@ arguments in that order.")
     (message "Go Test finished.")))
 
 
+(defvar go-test--current-test-cache nil
+  "Store the suite and test of the last execution.")
+
+
 (defvar go-test-regexp-prefix
   "^[[:space:]]*func[[:space:]]\\(([^()]*?)\\)?[[:space:]]*\\("
   "The prefix of the go-test regular expression.")
@@ -454,18 +458,27 @@ For example, if the current buffer is `foo.go', the buffer for
 ;; ----------------------
 
 ;;;###autoload
-(defun go-test-current-test ()
+(defun go-test-current-test-cache ()
+  "Repeat the previous current test execution."
+  (interactive)
+  (go-test-current-test 'last))
+
+;;;###autoload
+(defun go-test-current-test (&optional last)
   "Launch go test on the current test."
   (interactive)
-  (cl-destructuring-bind (test-suite test-name) (go-test--get-current-test-info)
-    (let ((test-flag (if (> (length test-suite) 0) "-m " "-run "))
-          (additional-arguments (if go-test-additional-arguments-function
-                                    (funcall go-test-additional-arguments-function
-                                             test-suite test-name) "")))
-      (when test-name
-        (if (go-test--is-gb-project)
-            (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$ ."))
-          (go-test--go-test (s-concat test-flag test-name additional-arguments "\\$ .")))))))
+  (unless (string-equal (symbol-name last) "last")
+    (setq go-test--current-test-cache (go-test--get-current-test-info)))
+  (when go-test--current-test-cache
+    (cl-destructuring-bind (test-suite test-name) go-test--current-test-cache
+      (let ((test-flag (if (> (length test-suite) 0) "-m " "-run "))
+            (additional-arguments (if go-test-additional-arguments-function
+                                      (funcall go-test-additional-arguments-function
+                                               test-suite test-name) "")))
+        (when test-name
+          (if (go-test--is-gb-project)
+              (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$ ."))
+            (go-test--go-test (s-concat test-flag test-name additional-arguments "\\$ ."))))))))
 
 
 ;;;###autoload
