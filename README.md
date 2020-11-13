@@ -64,6 +64,10 @@ Launch go benchmark on current file
 
 Launch go benchmark on current project
 
+### go-test-rerun-test
+
+Rerun the previous test.
+
 ### go-run
 
 Launch program via `go run`.  Optionally configure the buffer-local

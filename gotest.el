@@ -66,6 +66,8 @@ See https://getgb.io."
 (defvar go-run-history nil
   "History list for go run command arguments.")
 
+(defvar go-test-previous-exec-command nil
+   "Previous execute command.")
 
 ;; Faces
 ;; -----------
@@ -385,6 +387,7 @@ For example, if the current buffer is `foo.go', the buffer for
   "Start the go test command using `ARGS'."
   (let ((buffer "*Go Test*")) ; (concat "*go-test " args "*")))
     (go-test--cleanup buffer)
+    (setq go-test-previous-exec-command `(,args ,env))
     (compilation-start (go-test--get-program (go-test--arguments args) env)
                        'go-test-mode
                        'go-test--compilation-name)
@@ -404,6 +407,11 @@ For example, if the current buffer is `foo.go', the buffer for
                 (shell-quote-argument (buffer-file-name)))))
     (go-test--get-arguments opts 'go-run-history)))
 
+(defun go-test--go-rerun-previous-command ()
+  "Rerun the previous go command."
+  (if go-test-previous-exec-command
+      (go-test--go-test (car go-test-previous-exec-command) (cadr go-test-previous-exec-command))
+    (message "Test is not running yet.")))
 
 ;; (defun gb-test-run (args)
 ;;   "Test using GB.
@@ -474,21 +482,23 @@ For example, if the current buffer is `foo.go', the buffer for
       (let ((test-flag (if (> (length test-suite) 0) "-m " "-run "))
             (additional-arguments (if go-test-additional-arguments-function
                                       (funcall go-test-additional-arguments-function
-                                               test-suite test-name) "")))
+                                               test-suite test-name) ""))
+            (current-dir (f-dirname (f-this-file))))
         (when test-name
           (if (go-test--is-gb-project)
-              (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$ ."))
-            (go-test--go-test (s-concat test-flag test-name "\\$ . " additional-arguments))))))))
+              (go-test--gb-start (s-concat "-test.v=true -test.run=" test-name "\\$ " current-dir))
+            (go-test--go-test (s-concat test-flag test-name "\\$ " current-dir " " additional-arguments))))))))
 
 
 ;;;###autoload
 (defun go-test-current-file ()
   "Launch go test on the current buffer file."
   (interactive)
-  (let ((data (go-test--get-current-file-testing-data)))
+  (let ((data (go-test--get-current-file-testing-data))
+        (current-dir (f-dirname (f-this-file))))
     (if (go-test--is-gb-project)
         (go-test--gb-start (s-concat "-test.v=true -test.run='" data "'"))
-      (go-test--go-test (s-concat "-run='" data "' .")))))
+      (go-test--go-test (s-concat "-run='" data "' " current-dir)))))
 
 
 ;;;###autoload
@@ -497,9 +507,10 @@ For example, if the current buffer is `foo.go', the buffer for
   (interactive)
   (if (go-test--is-gb-project)
       (go-test--gb-start "all -test.v=true")
-    (let ((packages (cl-remove-if (lambda (s) (s-contains? "/vendor/" s))
+    (let* ((current-dir (f-dirname (f-this-file)))
+          (packages (cl-remove-if (lambda (s) (s-contains? "/vendor/" s))
                                   (s-split "\n"
-                                           (shell-command-to-string "go list ./...")))))
+                                           (shell-command-to-string (s-concat "go list " current-dir "/..."))))))
       (go-test--go-test (s-join " " packages)))))
 
 
@@ -512,25 +523,26 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test-current-benchmark ()
   "Launch go benchmark on current benchmark."
   (interactive)
-  (let ((benchmark-name (go-test--get-current-benchmark)))
+  (let ((benchmark-name (go-test--get-current-benchmark))
+        (current-dir (f-dirname (f-this-file))))
     (when benchmark-name
-      (go-test--go-test (s-concat "-run ^NOTHING -bench " benchmark-name "\\$")))))
+      (go-test--go-test (s-concat "-run ^NOTHING -bench " benchmark-name "\\$ "current-dir)))))
 
 
 ;;;###autoload
 (defun go-test-current-file-benchmarks ()
   "Launch go benchmark on current file benchmarks."
   (interactive)
-  (let ((benchmarks (go-test--get-current-file-benchmarks)))
-    (go-test--go-test (s-concat "-run ^NOTHING -bench '" benchmarks "'"))))
-
+  (let ((benchmarks (go-test--get-current-file-benchmarks))
+        (current-dir (f-dirname (f-this-file))))
+    (go-test--go-test (s-concat "-run ^NOTHING -bench '" benchmarks "' " current-dir))))
 
 ;;;###autoload
 (defun go-test-current-project-benchmarks ()
   "Launch go benchmark on current project."
   (interactive)
-  (go-test--go-test (s-concat "-run ^NOTHING -bench .")))
-
+  (let ((current-dir (f-dirname (f-this-file))))
+    (go-test--go-test (s-concat "-run ^NOTHING -bench " current-dir))))
 
 ;; Coverage
 ;; -------------
@@ -545,12 +557,22 @@ For example, if the current buffer is `foo.go', the buffer for
              (root-dir (go-test--get-root-directory))
              (gopath (s-concat "env GOPATH=" root-dir ":" root-dir "vendor")))
         (go-test--go-test (s-concat "-cover " package) gopath))
-    (let ((args (s-concat
+    (let* ((current-dir (f-dirname (f-this-file)))
+          (args (s-concat
                  "--coverprofile="
                  (expand-file-name
-                  (read-file-name "Coverage file" nil "cover.out")) " ./.")))
+                  (read-file-name "Coverage file" nil "cover.out")) " " current-dir "/.")))
       (go-test--go-test args))))
 
+;; ReRun
+;; ----------------------
+
+
+;;;###autoload
+(defun go-test-rerun-test ()
+  "Rerun the previous test."
+  (interactive)
+  (go-test--go-rerun-previous-command))
 
 ;;;###autoload
 (defun go-run (&optional args)
