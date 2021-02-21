@@ -471,7 +471,7 @@ For example, if the current buffer is `foo.go', the buffer for
     (setq go-test--current-test-cache (go-test--get-current-test-info)))
   (when go-test--current-test-cache
     (cl-destructuring-bind (test-suite test-name) go-test--current-test-cache
-      (let ((test-flag (if (> (length test-suite) 0) "-m " "-run "))
+      (let ((test-flag (if (> (length test-suite) 0) "-testify.m " "-run "))
             (additional-arguments (if go-test-additional-arguments-function
                                       (funcall go-test-additional-arguments-function
                                                test-suite test-name) "")))
