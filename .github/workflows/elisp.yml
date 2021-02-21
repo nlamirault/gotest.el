@@ -3,16 +3,25 @@ name: Emacs lisp
 on:
   push:
     # branches to consider in the event; optional, defaults to all
-    branches:
-      - master
+    # branches:
+    #   - master
 
 jobs:
   update_release_draft:
     runs-on: ubuntu-latest
     steps:
-      - uses: leotaku/elisp-check@master
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v2
         with:
-          check: melpa
-          file: '*.el'
-          ignore_warnings: false
-          warnings_as_errors: false
+          python-version: '3.6'
+          architecture: 'x64'
+      - uses: purcell/setup-emacs@master
+        with:
+          version: '26.3'
+
+      - uses: conao3/setup-cask@master
+        with:
+          version: 'snapshot'
+
+      - name: Run tests
+        run: make test
