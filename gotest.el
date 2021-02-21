@@ -274,7 +274,7 @@ For example, if the current buffer is `foo.go', the buffer for
         (error "Unable to find data"))
       (save-excursion
         (search-forward prefix)
-        (setq name (thing-at-point 'word))))
+        (setq name (thing-at-point 'symbol t))))
     name))
 
 (defun go-test--get-current-test-info ()
