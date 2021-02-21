@@ -74,7 +74,7 @@
      (should (string= (go-test-command "-v ")
                       (go-test--get-program (go-test--arguments ""))))
      (let ((go-test-args "-race"))
-       (should (string= (go-test-command "-v -race")
+       (should (string= (go-test-command "-v -race ")
                         (go-test--get-program (go-test--arguments ""))))))))
 
 (ert-deftest test-go-run-command-without-args ()
