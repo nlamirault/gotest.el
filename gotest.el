@@ -385,6 +385,7 @@ For example, if the current buffer is `foo.go', the buffer for
   "Start the go test command using `ARGS'."
   (let ((buffer "*Go Test*")) ; (concat "*go-test " args "*")))
     (go-test--cleanup buffer)
+    (save-some-buffers (not compilation-ask-about-save) compilation-save-buffers-predicate)
     (compilation-start (go-test--get-program (go-test--arguments args) env)
                        'go-test-mode
                        'go-test--compilation-name)
