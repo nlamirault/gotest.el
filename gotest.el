@@ -249,13 +249,13 @@ When a numeric prefix argument is provided, it is used as the -count flag."
 (defun go-test--get-current-buffer ()
   "Return the test buffer for the current `buffer-file-name'.
 If `buffer-file-name' ends with `_test.go', `current-buffer' is returned.
-Otherwise, `ff-other-file-name' is used to find the test buffer.
+Otherwise, `ff-get-other-file' is used to find the test buffer.
 For example, if the current buffer is `foo.go', the buffer for
 `foo_test.go' is returned."
   (if (string-match "_test\.go$" buffer-file-name)
       (current-buffer)
     (let ((ff-always-try-to-create nil)
-	  (filename (ff-other-file-name)))
+	  (filename (ff-get-other-file)))
       (when filename
 	(find-file-noselect filename)))))
 
