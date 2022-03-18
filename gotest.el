@@ -282,7 +282,7 @@ For example, if the current buffer is `foo.go', the buffer for
   (save-excursion
     (end-of-line)
     (if (search-backward-regexp
-         (format "%s\\(Test\\|Example\\)%s" go-test-regexp-prefix go-test-regexp-suffix)
+         (format "%s\\(Test\\|Example\\|Fuzz\\)%s" go-test-regexp-prefix go-test-regexp-suffix)
          nil t)
         (let ((suite-match (match-string-no-properties 1))
               (test-match (match-string-no-properties 2)))
@@ -303,6 +303,10 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test--get-current-benchmark ()
   "Return the current benchmark name."
   (go-test--get-current-data "Benchmark"))
+
+(defun go-test--get-current-fuzz ()
+  "Return the current fuzz name."
+  (go-test--get-current-data "Fuzz"))
 
 
 (defun go-test--get-current-example ()
@@ -516,6 +520,13 @@ For example, if the current buffer is `foo.go', the buffer for
     (when benchmark-name
       (go-test--go-test (s-concat "-run ^NOTHING -bench " benchmark-name "\\$")))))
 
+;;;###autoload
+(defun go-test-current-fuzz ()
+  "Launch go test on current fuzz."
+  (interactive)
+  (let ((fuzz-name (go-test--get-current-fuzz)))
+    (when fuzz-name
+      (go-test--go-test (s-concat "-fuzz=" fuzz-name "\\$")))))
 
 ;;;###autoload
 (defun go-test-current-file-benchmarks ()
