@@ -45,6 +45,16 @@
   :type 'boolean
   :group 'gotest)
 
+(defvar-local go-test-go-command nil
+  "The 'go' command for 'go test' that should be used instead of `go-command'.
+
+This variable is buffer-local, set using .dir-locals.el for example.")
+
+(defvar-local go-run-go-command nil
+  "The 'go' command for 'go run' that should be used instead of `go-command'.
+
+This variable is buffer-local, set using .dir-locals.el for example.")
+
 (defcustom go-test-gb-command "gb"
   "The 'gb' command.
 A project based build tool for the Go programming language.
@@ -208,9 +218,10 @@ See also: `compilation-error-regexp-alist'."
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments.
 When `ENV' concatenate before command."
-  (if env
-      (s-concat env " " go-command " test " args)
-    (s-concat go-command " test " args)))
+  (let ((command-args (s-concat (or go-test-go-command go-command) " test " args)))
+    (if env
+        (s-concat env " " command-args)
+      command-args)))
 
 
 (defun go-test--gb-get-program (args)
@@ -395,7 +406,7 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test--go-run-get-program (args)
   "Return the command to launch go run.
 `ARGS' corresponds to go command line arguments."
-  (s-concat go-command " run " args))
+  (s-concat (or go-run-go-command go-command) " run " args))
 
 (defun go-test--go-run-arguments ()
   "Arguments for go run."
