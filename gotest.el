@@ -5,7 +5,7 @@
 ;; Version: 0.14.0
 ;; Keywords: languages, go, tests
 
-;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.19.0") (go-mode "1.5.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (f "0.19.0"))
 
 ;; Copyright (C) 2014, 2015, 2016, 2017 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -33,8 +33,6 @@
 (require 's)
 (require 'f)
 (require 'cl-lib)
-(require 'go-mode)
-
 
 (defgroup gotest nil
   "GoTest utility"
@@ -46,12 +44,12 @@
   :group 'gotest)
 
 (defvar-local go-test-go-command nil
-  "The 'go' command for 'go test' that should be used instead of `go-command'.
+  "The 'go' command for 'go test' that should be used instead of `go'.
 
 This variable is buffer-local, set using .dir-locals.el for example.")
 
 (defvar-local go-run-go-command nil
-  "The 'go' command for 'go run' that should be used instead of `go-command'.
+  "The 'go' command for 'go run' that should be used instead of `go'.
 
 This variable is buffer-local, set using .dir-locals.el for example.")
 
@@ -218,7 +216,7 @@ See also: `compilation-error-regexp-alist'."
   "Return the command to launch unit test.
 `ARGS' corresponds to go command line arguments.
 When `ENV' concatenate before command."
-  (let ((command-args (s-concat (or go-test-go-command go-command) " test " args)))
+  (let ((command-args (s-concat (or go-test-go-command "go") " test " args)))
     (if env
         (s-concat env " " command-args)
       command-args)))
@@ -406,7 +404,7 @@ For example, if the current buffer is `foo.go', the buffer for
 (defun go-test--go-run-get-program (args)
   "Return the command to launch go run.
 `ARGS' corresponds to go command line arguments."
-  (s-concat (or go-run-go-command go-command) " run " args))
+  (s-concat (or go-run-go-command "go") " run " args))
 
 (defun go-test--go-run-arguments ()
   "Arguments for go run."
