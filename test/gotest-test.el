@@ -77,6 +77,16 @@
        (should (string= (go-test-command "-v -race ")
                         (go-test--get-program (go-test--arguments ""))))))))
 
+(ert-deftest test-go-test-add-failfast-argument ()
+  :tags '(arguments current)
+  (with-test-sandbox
+   (let ((go-test-failfast t))
+     (should (string= (go-test-command "-failfast ")
+                      (go-test--get-program (go-test--arguments ""))))
+     (let ((go-test-args "-race"))
+       (should (string= (go-test-command "-failfast -race ")
+                        (go-test--get-program (go-test--arguments ""))))))))
+
 (ert-deftest test-go-run-command-without-args ()
   :tags '(arguments)
   (with-test-sandbox
