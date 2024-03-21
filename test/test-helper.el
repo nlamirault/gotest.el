@@ -70,7 +70,9 @@
   "Load current library from FILE."
   (let ((path (s-concat go-test-source-dir file)))
     (message (ansi-yellow "[gotest] Load library from %s" path))
-    (undercover "*.el" (:exclude "*-test.el"))
+    (undercover "*.el"
+                (:exclude "*-test.el")
+                (:report-format 'text))
     (require 'gotest path)))
 
 
