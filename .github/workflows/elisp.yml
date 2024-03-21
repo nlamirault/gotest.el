@@ -5,19 +5,20 @@ on:
     # branches to consider in the event; optional, defaults to all
     # branches:
     #   - master
+  pull_request:
 
 jobs:
   update_release_draft:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.6'
+          python-version: '3.9'
           architecture: 'x64'
       - uses: purcell/setup-emacs@master
         with:
-          version: '26.3'
+          version: '29.1'
 
       - uses: conao3/setup-cask@master
         with:

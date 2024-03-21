@@ -64,7 +64,7 @@
   :tags '(arguments)
   (with-test-sandbox
    (let ((go-test-args "-race"))
-     (should (string= (go-test-command " -race")
+     (should (string= (go-test-command "-race ")
                       (go-test--get-program (go-test--arguments "")))))))
 
 (ert-deftest test-go-test-add-verbose-argument ()
@@ -191,7 +191,7 @@
      (should (string= "ExampleA|ExampleB|ExampleC"
                       (go-test--get-current-file-testing-data))))))
 
-(ert-deftest test-go-test-get-current-file-tests ()
+(ert-deftest test-go-test-get-current-file-tests-contains-tests-examples ()
   :tags '(find current)
   (with-test-sandbox
    (with-current-buffer
@@ -199,7 +199,7 @@
      (should (string= "TestFoo|TestBar|Test_Baz|ExampleA|ExampleB|ExampleC"
                       (go-test--get-current-file-testing-data))))))
 
-(ert-deftest test-go-test-get-current-test ()
+(ert-deftest test-go-test-get-current-test-contains-example ()
   :tags '(find)
   (with-test-sandbox
    (with-current-buffer (find-file-noselect (concat go-test-testsuite-dir "/bar_test.go"))
