@@ -369,11 +369,14 @@ For example, if the current buffer is `foo.go', the buffer for
 
 (defun go-test--arguments (args)
   "Make the go test command argurments using `ARGS'."
-  (let ((opts args))
+  (let ((opts args)
+        (go-test-modfile (car (file-expand-wildcards "go_*.mod"))))
     (when go-test-args
       (setq opts (s-concat go-test-args " " opts)))
     (when go-test-verbose
       (setq opts (s-concat "-v " opts)))
+    (when go-test-modfile
+      (setq opts (s-concat "-modfile " go-test-modfile)))
     (go-test--get-arguments opts 'go-test-history)))
 
 
